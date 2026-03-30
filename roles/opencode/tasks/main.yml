@@ -95,14 +95,16 @@
     src: "{{ opencode_dotfiles_dir }}/.gitconfig"
     dest: "{{ opencode_home }}/.gitconfig"
     state: link
+    force: true
     owner: "{{ opencode_user }}"
     group: "{{ opencode_group }}"
 
 - name: Link opencode git hooks
   ansible.builtin.file:
-    src: "../src/dotfiles/.config/git-hooks"
+    src: "../src/dotfiles/config/git-hooks"
     dest: "{{ opencode_home }}/.config/git-hooks"
     state: link
+    force: true
     owner: "{{ opencode_user }}"
     group: "{{ opencode_group }}"
 
@@ -111,6 +113,7 @@
     src: "../src/dotfiles/.config/opencode"
     dest: "{{ opencode_home }}/.config/opencode"
     state: link
+    force: true
     owner: "{{ opencode_user }}"
     group: "{{ opencode_group }}"
 
