@@ -62,6 +62,8 @@ ansible opi -b -a 'journalctl -u opencode -n 50 --no-pager'
 
 Keep secrets out of the repo in plaintext. The role expects `opencode_server_password`.
 
+`ansible-vault` is recommended, not required. If `inventory/group_vars/opi/vault.yml` is kept out of Git, a plaintext file also works and Ansible will load it normally.
+
 Create the variable file from the example:
 
 ```bash
@@ -80,6 +82,8 @@ Encrypt it:
 ```bash
 ansible-vault encrypt inventory/group_vars/opi/vault.yml
 ```
+
+If you keep it as plaintext instead, you can skip encryption and run the playbook without `--ask-vault-pass`.
 
 Edit an encrypted file later:
 
