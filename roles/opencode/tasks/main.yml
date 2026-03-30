@@ -101,7 +101,7 @@
 
 - name: Link opencode git hooks
   ansible.builtin.file:
-    src: "../src/dotfiles/config/git-hooks"
+    src: "../src/dotfiles/.config/git-hooks"
     dest: "{{ opencode_home }}/.config/git-hooks"
     state: link
     force: true
