@@ -1,6 +1,8 @@
 [Unit]
 Description=OpenCode Web
 After=network.target
+StartLimitIntervalSec={{ opencode_start_limit_interval_sec }}
+StartLimitBurst={{ opencode_start_limit_burst }}
 
 [Service]
 Type=simple
@@ -9,9 +11,9 @@ Group={{ opencode_group }}
 WorkingDirectory={{ opencode_home }}
 Environment=HOME={{ opencode_home }}
 EnvironmentFile={{ opencode_env_file }}
-ExecStart={{ opencode_npm_prefix.stdout }}/bin/opencode web --hostname {{ opencode_web_hostname }} --port {{ opencode_web_port }}
+ExecStart={{ opencode_npm_prefix.stdout }}/bin/opencode web --print-logs --log-level {{ opencode_log_level }} --hostname {{ opencode_web_hostname }} --port {{ opencode_web_port }}
 Restart=always
-RestartSec=5s
+RestartSec={{ opencode_restart_sec }}
 OOMPolicy=continue
 MemoryMax={{ opencode_memory_max }}
 MemoryHigh={{ opencode_memory_high }}
@@ -21,7 +23,7 @@ ProtectSystem=strict
 ProtectKernelTunables=true
 ProtectKernelModules=true
 ProtectControlGroups=true
-RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX AF_NETLINK
 LockPersonality=true
 RestrictRealtime=true
 RestrictNamespaces=true
