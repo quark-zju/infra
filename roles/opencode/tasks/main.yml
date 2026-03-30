@@ -3,6 +3,7 @@
     name:
       - git
       - npm
+      - zsh
     state: present
     update_cache: true
 
@@ -49,7 +50,7 @@
     system: true
     create_home: true
     home: "{{ opencode_home }}"
-    shell: /usr/sbin/nologin
+    shell: /bin/zsh
 
 - name: Ensure opencode home exists
   ansible.builtin.file:
