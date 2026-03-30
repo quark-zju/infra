@@ -65,6 +65,25 @@
     group: root
     mode: "0755"
 
+- name: Locate opencode vault variables file
+  ansible.builtin.set_fact:
+    opencode_vault_file: >-
+      {{ lookup(
+        'ansible.builtin.first_found',
+        {
+          'files': [
+            inventory_dir ~ '/group_vars/' ~ inventory_hostname ~ '/vault.yml',
+            playbook_dir ~ '/../group_vars/' ~ inventory_hostname ~ '/vault.yml'
+          ]
+        },
+        errors='ignore'
+      ) }}
+
+- name: Load opencode vault variables
+  ansible.builtin.include_vars:
+    file: "{{ opencode_vault_file }}"
+  when: opencode_vault_file | length > 0
+
 - name: Require opencode server password
   ansible.builtin.assert:
     that:

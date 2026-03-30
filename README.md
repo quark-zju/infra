@@ -65,39 +65,41 @@ Keep secrets out of the repo in plaintext. The role expects `opencode_server_pas
 Create the variable file from the example:
 
 ```bash
-mkdir -p group_vars/opi
-cp group_vars/opi/vault.yml.example group_vars/opi/vault.yml
+mkdir -p inventory/group_vars/opi
+cp inventory/group_vars/opi/vault.yml.example inventory/group_vars/opi/vault.yml
 ```
 
 Edit the file before encrypting it:
 
 ```bash
-$EDITOR group_vars/opi/vault.yml
+$EDITOR inventory/group_vars/opi/vault.yml
 ```
 
 Encrypt it:
 
 ```bash
-ansible-vault encrypt group_vars/opi/vault.yml
+ansible-vault encrypt inventory/group_vars/opi/vault.yml
 ```
 
 Edit an encrypted file later:
 
 ```bash
-ansible-vault edit group_vars/opi/vault.yml
+ansible-vault edit inventory/group_vars/opi/vault.yml
 ```
 
 View it without modifying:
 
 ```bash
-ansible-vault view group_vars/opi/vault.yml
+ansible-vault view inventory/group_vars/opi/vault.yml
 ```
 
 Rekey it:
 
 ```bash
-ansible-vault rekey group_vars/opi/vault.yml
+ansible-vault rekey inventory/group_vars/opi/vault.yml
 ```
+
+The role also supports the older repo-root path `group_vars/opi/vault.yml` for compatibility, but new files should go under `inventory/group_vars/`.
 
 If you prefer a local vault password file, save it outside the repo or in `.vault_pass.txt` and keep it untracked:
 
