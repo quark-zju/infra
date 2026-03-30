@@ -100,6 +100,24 @@
     owner: "{{ opencode_user }}"
     group: "{{ opencode_group }}"
 
+- name: Link opencode zshrc
+  ansible.builtin.file:
+    src: "{{ opencode_dotfiles_dir }}/.zshrc"
+    dest: "{{ opencode_home }}/.zshrc"
+    state: link
+    force: true
+    owner: "{{ opencode_user }}"
+    group: "{{ opencode_group }}"
+
+- name: Link opencode zsh config
+  ansible.builtin.file:
+    src: "../src/dotfiles/config/zsh"
+    dest: "{{ opencode_home }}/.config/zsh"
+    state: link
+    force: true
+    owner: "{{ opencode_user }}"
+    group: "{{ opencode_group }}"
+
 - name: Link opencode git hooks
   ansible.builtin.file:
     src: "../src/dotfiles/.config/git-hooks"
