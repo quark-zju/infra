@@ -113,19 +113,54 @@
     path: "{{ opencode_home }}/.config/opencode"
   register: opencode_config_path
 
-- name: Remove existing opencode config directory
+- name: Ensure opencode config directory exists
   ansible.builtin.file:
     path: "{{ opencode_home }}/.config/opencode"
-    state: absent
-  when:
-    - opencode_config_path.stat.exists
-    - opencode_config_path.stat.isdir
-    - not opencode_config_path.stat.islnk | default(false)
+    state: directory
+    owner: "{{ opencode_user }}"
+    group: "{{ opencode_group }}"
+    mode: "0750"
 
-- name: Link opencode opencode config
+- name: Remove existing opencode AGENTS.md
   ansible.builtin.file:
-    src: "../src/dotfiles/.config/opencode"
-    dest: "{{ opencode_home }}/.config/opencode"
+    path: "{{ opencode_home }}/.config/opencode/AGENTS.md"
+    state: absent
+  when: opencode_config_path.stat.exists | default(false)
+
+- name: Remove existing opencode config json
+  ansible.builtin.file:
+    path: "{{ opencode_home }}/.config/opencode/opencode.json"
+    state: absent
+  when: opencode_config_path.stat.exists | default(false)
+
+- name: Remove existing opencode plugins path
+  ansible.builtin.file:
+    path: "{{ opencode_home }}/.config/opencode/plugins"
+    state: absent
+  when: opencode_config_path.stat.exists | default(false)
+
+- name: Link opencode AGENTS.md
+  ansible.builtin.file:
+    src: "../../src/dotfiles/.config/opencode/AGENTS.md"
+    dest: "{{ opencode_home }}/.config/opencode/AGENTS.md"
+    state: link
+    force: true
+    owner: "{{ opencode_user }}"
+    group: "{{ opencode_group }}"
+
+- name: Link opencode opencode.json
+  ansible.builtin.file:
+    src: "../../src/dotfiles/.config/opencode/opencode.json"
+    dest: "{{ opencode_home }}/.config/opencode/opencode.json"
+    state: link
+    force: true
+    owner: "{{ opencode_user }}"
+    group: "{{ opencode_group }}"
+
+- name: Link opencode plugins
+  ansible.builtin.file:
+    src: "../../src/dotfiles/.config/opencode/plugins"
+    dest: "{{ opencode_home }}/.config/opencode/plugins"
     state: link
     force: true
     owner: "{{ opencode_user }}"
