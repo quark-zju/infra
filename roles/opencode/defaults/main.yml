@@ -1,7 +1,7 @@
 opencode_service_name: opencode
 opencode_user: opencode
 opencode_group: opencode
-opencode_home: /var/lib/opencode
+opencode_home: /home/opencode
 opencode_config_dir: /etc/opencode
 opencode_env_file: /etc/opencode/opencode.env
 opencode_web_hostname: 0.0.0.0
