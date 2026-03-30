@@ -11,7 +11,7 @@ Group={{ opencode_group }}
 WorkingDirectory={{ opencode_home }}
 Environment=HOME={{ opencode_home }}
 EnvironmentFile={{ opencode_env_file }}
-ExecStart={{ opencode_npm_prefix.stdout }}/bin/opencode web --print-logs --log-level {{ opencode_log_level }} --hostname {{ opencode_web_hostname }} --port {{ opencode_web_port }}
+ExecStart={{ opencode_npm_prefix.stdout }}/bin/opencode serve --print-logs --log-level {{ opencode_log_level }} --hostname {{ opencode_web_hostname }} --port {{ opencode_web_port }}
 Restart=always
 RestartSec={{ opencode_restart_sec }}
 OOMPolicy=continue
