@@ -3,6 +3,8 @@
     name:
       - git
       - npm
+      - python-is-python3
+      - ripgrep
       - zsh
     state: present
     update_cache: true
