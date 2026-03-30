@@ -108,11 +108,6 @@
     owner: "{{ opencode_user }}"
     group: "{{ opencode_group }}"
 
-- name: Check existing opencode config path
-  ansible.builtin.stat:
-    path: "{{ opencode_home }}/.config/opencode"
-  register: opencode_config_path
-
 - name: Ensure opencode config directory exists
   ansible.builtin.file:
     path: "{{ opencode_home }}/.config/opencode"
@@ -120,24 +115,6 @@
     owner: "{{ opencode_user }}"
     group: "{{ opencode_group }}"
     mode: "0750"
-
-- name: Remove existing opencode AGENTS.md
-  ansible.builtin.file:
-    path: "{{ opencode_home }}/.config/opencode/AGENTS.md"
-    state: absent
-  when: opencode_config_path.stat.exists | default(false)
-
-- name: Remove existing opencode config json
-  ansible.builtin.file:
-    path: "{{ opencode_home }}/.config/opencode/opencode.json"
-    state: absent
-  when: opencode_config_path.stat.exists | default(false)
-
-- name: Remove existing opencode plugins path
-  ansible.builtin.file:
-    path: "{{ opencode_home }}/.config/opencode/plugins"
-    state: absent
-  when: opencode_config_path.stat.exists | default(false)
 
 - name: Link opencode AGENTS.md
   ansible.builtin.file:
