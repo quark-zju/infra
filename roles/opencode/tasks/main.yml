@@ -1,6 +1,8 @@
 - name: Ensure npm is installed
   ansible.builtin.apt:
-    name: npm
+    name:
+      - git
+      - npm
     state: present
     update_cache: true
 
@@ -56,6 +58,29 @@
     owner: "{{ opencode_user }}"
     group: "{{ opencode_group }}"
     mode: "0750"
+
+- name: Ensure opencode src directory exists
+  ansible.builtin.file:
+    path: "{{ opencode_src_dir }}"
+    state: directory
+    owner: "{{ opencode_user }}"
+    group: "{{ opencode_group }}"
+    mode: "0750"
+
+- name: Check whether opencode dotfiles repo exists
+  ansible.builtin.stat:
+    path: "{{ opencode_dotfiles_dir }}/.git"
+  register: opencode_dotfiles_git_dir
+
+- name: Clone opencode dotfiles repo
+  ansible.builtin.git:
+    repo: "{{ opencode_dotfiles_repo }}"
+    dest: "{{ opencode_dotfiles_dir }}"
+    version: HEAD
+    update: false
+  become: true
+  become_user: "{{ opencode_user }}"
+  when: not opencode_dotfiles_git_dir.stat.exists
 
 - name: Ensure opencode config directory exists
   ansible.builtin.file:

@@ -2,6 +2,9 @@ opencode_service_name: opencode
 opencode_user: opencode
 opencode_group: opencode
 opencode_home: /home/opencode
+opencode_src_dir: /home/opencode/src
+opencode_dotfiles_dir: /home/opencode/src/dotfiles
+opencode_dotfiles_repo: https://github.com/quark-zju/dotfiles
 opencode_config_dir: /etc/opencode
 opencode_env_file: /etc/opencode/opencode.env
 opencode_web_hostname: 0.0.0.0
