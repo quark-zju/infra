@@ -1,10 +1,11 @@
-- name: Ensure npm is installed
+- name: Ensure base packages are installed
   ansible.builtin.apt:
     name:
       - git
       - npm
       - python-is-python3
       - ripgrep
+      - rustup
       - zsh
     state: present
     update_cache: true
