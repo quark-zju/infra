@@ -1,0 +1,15 @@
+- name: Ensure npm is installed
+  ansible.builtin.apt:
+    name: npm
+    state: present
+    update_cache: true
+
+- name: Check whether opencode is already installed globally
+  ansible.builtin.command: npm list -g opencode-ai --depth=0
+  register: opencode_npm_list
+  changed_when: false
+  failed_when: false
+
+- name: Install opencode globally
+  ansible.builtin.command: npm install -g opencode-ai
+  when: opencode_npm_list.rc != 0
