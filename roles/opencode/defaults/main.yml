@@ -1,0 +1,10 @@
+opencode_service_name: opencode
+opencode_user: opencode
+opencode_group: opencode
+opencode_home: /var/lib/opencode
+opencode_config_dir: /etc/opencode
+opencode_env_file: /etc/opencode/opencode.env
+opencode_web_hostname: 0.0.0.0
+opencode_web_port: 4096
+opencode_memory_high: 650M
+opencode_memory_max: 800M

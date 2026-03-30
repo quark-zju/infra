@@ -1,0 +1,8 @@
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Restart opencode
+  ansible.builtin.systemd:
+    name: "{{ opencode_service_name }}"
+    state: restarted

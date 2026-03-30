@@ -4,12 +4,99 @@
     state: present
     update_cache: true
 
+- name: Determine global npm prefix
+  ansible.builtin.command:
+    argv:
+      - npm
+      - prefix
+      - -g
+  register: opencode_npm_prefix
+  changed_when: false
+
 - name: Check whether opencode is already installed globally
-  ansible.builtin.command: npm list -g opencode-ai --depth=0
+  ansible.builtin.command:
+    argv:
+      - npm
+      - list
+      - -g
+      - opencode-ai
+      - --depth=0
   register: opencode_npm_list
   changed_when: false
   failed_when: false
 
 - name: Install opencode globally
-  ansible.builtin.command: npm install -g opencode-ai
+  ansible.builtin.command:
+    argv:
+      - npm
+      - install
+      - -g
+      - opencode-ai
   when: opencode_npm_list.rc != 0
+  notify: Restart opencode
+
+- name: Ensure opencode group exists
+  ansible.builtin.group:
+    name: "{{ opencode_group }}"
+    system: true
+
+- name: Ensure opencode user exists
+  ansible.builtin.user:
+    name: "{{ opencode_user }}"
+    group: "{{ opencode_group }}"
+    system: true
+    create_home: true
+    home: "{{ opencode_home }}"
+    shell: /usr/sbin/nologin
+
+- name: Ensure opencode home exists
+  ansible.builtin.file:
+    path: "{{ opencode_home }}"
+    state: directory
+    owner: "{{ opencode_user }}"
+    group: "{{ opencode_group }}"
+    mode: "0750"
+
+- name: Ensure opencode config directory exists
+  ansible.builtin.file:
+    path: "{{ opencode_config_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Require opencode server password
+  ansible.builtin.assert:
+    that:
+      - opencode_server_password is defined
+      - opencode_server_password | length > 0
+    fail_msg: Define opencode_server_password, preferably in an ansible-vault file.
+
+- name: Write opencode environment file
+  ansible.builtin.copy:
+    dest: "{{ opencode_env_file }}"
+    owner: root
+    group: root
+    mode: "0600"
+    content: |
+      OPENCODE_SERVER_PASSWORD={{ opencode_server_password | to_json }}
+  no_log: true
+  notify: Restart opencode
+
+- name: Install opencode systemd unit
+  ansible.builtin.template:
+    src: opencode.service.j2
+    dest: /etc/systemd/system/{{ opencode_service_name }}.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Reload systemd
+    - Restart opencode
+
+- name: Ensure opencode service is enabled and started
+  ansible.builtin.systemd:
+    name: "{{ opencode_service_name }}"
+    enabled: true
+    state: started
+    daemon_reload: true
