@@ -67,6 +67,14 @@
     group: "{{ opencode_group }}"
     mode: "0750"
 
+- name: Ensure opencode .config directory exists
+  ansible.builtin.file:
+    path: "{{ opencode_home }}/.config"
+    state: directory
+    owner: "{{ opencode_user }}"
+    group: "{{ opencode_group }}"
+    mode: "0750"
+
 - name: Check whether opencode dotfiles repo exists
   ansible.builtin.stat:
     path: "{{ opencode_dotfiles_dir }}/.git"
@@ -81,6 +89,41 @@
   become: true
   become_user: "{{ opencode_user }}"
   when: not opencode_dotfiles_git_dir.stat.exists
+
+- name: Link opencode gitconfig
+  ansible.builtin.file:
+    src: "{{ opencode_dotfiles_dir }}/.gitconfig"
+    dest: "{{ opencode_home }}/.gitconfig"
+    state: link
+    owner: "{{ opencode_user }}"
+    group: "{{ opencode_group }}"
+
+- name: Link opencode git hooks
+  ansible.builtin.file:
+    src: "../src/dotfiles/.config/git-hooks"
+    dest: "{{ opencode_home }}/.config/git-hooks"
+    state: link
+    owner: "{{ opencode_user }}"
+    group: "{{ opencode_group }}"
+
+- name: Link opencode opencode config
+  ansible.builtin.file:
+    src: "../src/dotfiles/.config/opencode"
+    dest: "{{ opencode_home }}/.config/opencode"
+    state: link
+    owner: "{{ opencode_user }}"
+    group: "{{ opencode_group }}"
+
+- name: Write opencode local git config
+  ansible.builtin.copy:
+    dest: "{{ opencode_home }}/.gitconfig.local"
+    owner: "{{ opencode_user }}"
+    group: "{{ opencode_group }}"
+    mode: "0640"
+    content: |
+      [user]
+              name = Jun Wu
+              email = quark@lihdd.net
 
 - name: Ensure opencode config directory exists
   ansible.builtin.file:
