@@ -113,12 +113,10 @@
     path: "{{ opencode_home }}/.config/opencode"
   register: opencode_config_path
 
-- name: Backup existing opencode config directory
-  ansible.builtin.command:
-    argv:
-      - mv
-      - "{{ opencode_home }}/.config/opencode"
-      - "{{ opencode_home }}/.config/opencode{{ opencode_backup_suffix }}"
+- name: Remove existing opencode config directory
+  ansible.builtin.file:
+    path: "{{ opencode_home }}/.config/opencode"
+    state: absent
   when:
     - opencode_config_path.stat.exists
     - opencode_config_path.stat.isdir
