@@ -9,7 +9,7 @@ opencode_config_dir: /etc/opencode
 opencode_env_file: /etc/opencode/opencode.env
 opencode_web_hostname: 0.0.0.0
 opencode_web_port: 4096
-opencode_log_level: INFO
+opencode_log_level: ERROR
 opencode_restart_sec: 15s
 opencode_start_limit_interval_sec: 5min
 opencode_start_limit_burst: 5
