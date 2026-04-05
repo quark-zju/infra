@@ -82,18 +82,74 @@
 
 - name: Check whether opencode dotfiles repo exists
   ansible.builtin.stat:
-    path: "{{ opencode_dotfiles_dir }}/.git"
-  register: opencode_dotfiles_git_dir
+    path: "{{ item.dest }}/.git"
+  loop: "{{ opencode_repositories }}"
+  register: opencode_repository_git_dirs
 
-- name: Clone opencode dotfiles repo
+- name: Clone opencode repositories
   ansible.builtin.git:
-    repo: "{{ opencode_dotfiles_repo }}"
-    dest: "{{ opencode_dotfiles_dir }}"
+    repo: "{{ item.item.repo }}"
+    dest: "{{ item.item.dest }}"
     version: HEAD
     update: false
   become: true
   become_user: "{{ opencode_user }}"
-  when: not opencode_dotfiles_git_dir.stat.exists
+  loop: "{{ opencode_repository_git_dirs.results }}"
+  when: not item.stat.exists
+
+- name: Check whether stable rust toolchain is installed
+  ansible.builtin.command:
+    argv:
+      - "{{ opencode_rustup_bin }}"
+      - run
+      - "{{ opencode_rustup_toolchain }}"
+      - rustc
+      - --version
+  register: opencode_rustup_toolchain_check
+  changed_when: false
+  failed_when: false
+  become: true
+  become_user: "{{ opencode_user }}"
+  environment:
+    HOME: "{{ opencode_home }}"
+
+- name: Install stable rust toolchain without docs
+  ansible.builtin.command:
+    argv:
+      - "{{ opencode_rustup_bin }}"
+      - toolchain
+      - install
+      - "{{ opencode_rustup_toolchain }}"
+      - --profile
+      - "{{ opencode_rustup_profile }}"
+  become: true
+  become_user: "{{ opencode_user }}"
+  environment:
+    HOME: "{{ opencode_home }}"
+  when: opencode_rustup_toolchain_check.rc != 0
+
+- name: Check whether leash is installed
+  ansible.builtin.stat:
+    path: "{{ opencode_home }}/.cargo/bin/leash"
+  register: opencode_leash_bin
+
+- name: Install leash from source
+  ansible.builtin.command:
+    argv:
+      - "{{ opencode_rustup_bin }}"
+      - run
+      - "{{ opencode_rustup_toolchain }}"
+      - cargo
+      - install
+      - --path
+      - .
+  args:
+    chdir: "{{ opencode_leash_dir }}"
+  become: true
+  become_user: "{{ opencode_user }}"
+  environment:
+    HOME: "{{ opencode_home }}"
+  when: not opencode_leash_bin.stat.exists
 
 - name: Link opencode gitconfig
   ansible.builtin.file:
