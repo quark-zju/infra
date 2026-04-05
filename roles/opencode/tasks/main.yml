@@ -57,6 +57,15 @@
     home: "{{ opencode_home }}"
     shell: /bin/zsh
 
+- name: Read opencode passwd entry
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ opencode_user }}"
+
+- name: Set opencode uid fact
+  ansible.builtin.set_fact:
+    opencode_user_uid: "{{ ansible_facts.getent_passwd[opencode_user][1] }}"
+
 - name: Ensure opencode home exists
   ansible.builtin.file:
     path: "{{ opencode_home }}"

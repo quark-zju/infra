@@ -8,11 +8,11 @@ StartLimitBurst={{ opencode_start_limit_burst }}
 Type=simple
 User={{ opencode_user }}
 Group={{ opencode_group }}
-RuntimeDirectory=user/%U
+RuntimeDirectory=user/{{ opencode_user_uid }}
 RuntimeDirectoryMode=0700
 WorkingDirectory={{ opencode_home }}
 Environment=HOME={{ opencode_home }}
-Environment=XDG_RUNTIME_DIR=/run/user/%U
+Environment=XDG_RUNTIME_DIR=/run/user/{{ opencode_user_uid }}
 Environment=AGENT_BROWSER_EXECUTABLE_PATH=/usr/bin/chromium
 Environment=PATH=/home/opencode/.cargo/bin:/home/opencode/.npm/global/bin:/home/opencode/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 EnvironmentFile={{ opencode_env_file }}
@@ -33,7 +33,7 @@ LockPersonality=true
 RestrictRealtime=true
 RestrictNamespaces=true
 ReadWritePaths={{ opencode_home }}
-ReadWritePaths=/run/user/%U
+ReadWritePaths=/run/user/{{ opencode_user_uid }}
 
 [Install]
 WantedBy=multi-user.target
