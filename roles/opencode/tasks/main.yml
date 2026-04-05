@@ -132,7 +132,7 @@
 - name: Check whether leash is installed
   ansible.builtin.stat:
     path: "{{ opencode_home }}/.cargo/bin/leash"
-  register: opencode_leash_bin
+  register: opencode_leash_bin_stat
 
 - name: Install leash from source
   ansible.builtin.command:
@@ -150,7 +150,7 @@
   become_user: "{{ opencode_user }}"
   environment:
     HOME: "{{ opencode_home }}"
-  when: not opencode_leash_bin.stat.exists
+  when: not opencode_leash_bin_stat.stat.exists
 
 - name: Link opencode gitconfig
   ansible.builtin.file:
