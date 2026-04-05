@@ -14,9 +14,9 @@ WorkingDirectory={{ opencode_home }}
 Environment=HOME={{ opencode_home }}
 Environment=XDG_RUNTIME_DIR=/run/user/%U
 Environment=AGENT_BROWSER_EXECUTABLE_PATH=/usr/bin/chromium
-Environment=PATH=/home/opencode/.npm/global/bin:/home/opencode/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=PATH=/home/opencode/.cargo/bin:/home/opencode/.npm/global/bin:/home/opencode/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 EnvironmentFile={{ opencode_env_file }}
-ExecStart={{ opencode_npm_prefix.stdout }}/bin/opencode serve --print-logs --log-level {{ opencode_log_level }} --hostname {{ opencode_web_hostname }} --port {{ opencode_web_port }}
+ExecStart={{ opencode_leash_bin }} run {{ opencode_npm_prefix.stdout }}/bin/opencode serve --print-logs --log-level {{ opencode_log_level }} --hostname {{ opencode_web_hostname }} --port {{ opencode_web_port }}
 Restart=always
 RestartSec={{ opencode_restart_sec }}
 OOMPolicy=continue
