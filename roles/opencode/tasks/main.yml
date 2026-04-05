@@ -2,6 +2,7 @@
   ansible.builtin.apt:
     name:
       - build-essential
+      - fuse3
       - git
       - npm
       - python-is-python3
