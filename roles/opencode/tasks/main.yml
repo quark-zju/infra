@@ -3,6 +3,7 @@
     name:
       - build-essential
       - fuse3
+      - gh
       - git
       - npm
       - python-is-python3
