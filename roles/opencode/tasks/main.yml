@@ -286,6 +286,7 @@
     mode: "0600"
     content: |
       OPENCODE_SERVER_PASSWORD={{ opencode_server_password | to_json }}
+      OPENCODE_ENABLE_EXA=1
   no_log: true
   notify: Restart opencode
 
