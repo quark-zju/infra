@@ -11,7 +11,7 @@ Group={{ opencode_group }}
 RuntimeDirectory=user/{{ opencode_user_uid }}
 RuntimeDirectoryMode=0700
 RuntimeDirectoryPreserve=yes
-WorkingDirectory={{ opencode_home }}
+WorkingDirectory={{ opencode_src_dir }}
 Environment=HOME={{ opencode_home }}
 Environment=XDG_RUNTIME_DIR=/run/user/{{ opencode_user_uid }}
 Environment=TMPDIR=/tmp
