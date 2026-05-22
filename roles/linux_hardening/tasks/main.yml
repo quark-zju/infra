@@ -10,6 +10,7 @@
   ansible.posix.sysctl:
     name: kernel.yama.ptrace_scope
     value: "{{ linux_hardening_ptrace_scope | string }}"
+    sysctl_file: "{{ linux_hardening_sysctl_file }}"
     state: present
     sysctl_set: true
     reload: true

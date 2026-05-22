@@ -8,6 +8,7 @@ Ansible repo for managing personal machines like `opi`, `localhost`, and other L
 - `playbooks/linux-hardening.yml`: baseline Linux security hardening for the `linux` group
 - `playbooks/opencode.yml`: installs and manages the OpenCode service on `opi`
 - `roles/linux_hardening/`: risky module blacklist + scoped ptrace policy
+- hardening sysctl file: `/etc/sysctl.d/99-linux-hardening.conf`
 - `roles/opencode/`: npm install, service account, env file, and systemd unit
 
 ## Common commands
