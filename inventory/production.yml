@@ -10,3 +10,4 @@ all:
     opi:
       hosts:
         opi:
+          ansible_user: root
