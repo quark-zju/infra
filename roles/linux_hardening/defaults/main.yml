@@ -1,0 +1,61 @@
+linux_hardening_modprobe_path: /etc/modprobe.d/blacklist.risky.conf
+linux_hardening_ptrace_scope: 1
+
+linux_hardening_module_groups:
+  - comment: "Copy Fail - CVE-2026-31431"
+    details: "AF_ALG / algif_aead path, local privilege escalation"
+    entries:
+      - { module: af_alg }
+      - { module: algif_aead }
+      - { module: algif_hash }
+      - { module: algif_skcipher }
+      - { module: algif_rng }
+
+  - comment: "Dirty Frag - CVE-2026-43284 / CVE-2026-43500"
+    details: "IPsec ESP + RxRPC page-cache write paths"
+    entries:
+      - { module: esp4 }
+      - { module: esp6 }
+      - { module: rxrpc }
+
+  - comment: "Fragnesia - CVE-2026-46300"
+    details: "XFRM / ESP-in-TCP related"
+    entries:
+      - { module: espintcp }
+
+  - comment: "DirtyDecrypt / DirtyCBC - CVE-2026-31635"
+    details: "Reported against rxgk / RxGK path"
+    entries:
+      - { module: rxgk }
+
+  - comment: "PinTheft - RDS LPE"
+    entries:
+      - { module: rds }
+      - { module: rds_tcp }
+
+  - comment: "uncommon network protocols"
+    details: "DCCP historical LPE, CVE-2017-6074"
+    entries:
+      - { module: dccp, blacklist: true }
+      - { module: dccp_ipv4 }
+      - { module: dccp_ipv6 }
+      - { module: sctp, blacklist: true }
+      - { module: rds, blacklist: true }
+      - { module: tipc, blacklist: true }
+
+  - comment: "HDLC TTY line discipline - CVE-2017-2636"
+    entries:
+      - { module: n_hdlc }
+
+  - comment: "uncommon filesystems"
+    entries:
+      - { module: cramfs, blacklist: true }
+      - { module: freevxfs, blacklist: true }
+      - { module: jffs2, blacklist: true }
+      - { module: hfs, blacklist: true }
+      - { module: hfsplus, blacklist: true }
+
+  - comment: "external buses"
+    entries:
+      - { module: firewire-core, blacklist: true }
+      - { module: firewire-ohci }

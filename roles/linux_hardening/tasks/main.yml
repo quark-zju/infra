@@ -1,0 +1,15 @@
+- name: Install risky module blacklist config
+  ansible.builtin.template:
+    src: blacklist.risky.conf.j2
+    dest: "{{ linux_hardening_modprobe_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Set scoped ptrace policy
+  ansible.posix.sysctl:
+    name: kernel.yama.ptrace_scope
+    value: "{{ linux_hardening_ptrace_scope | string }}"
+    state: present
+    sysctl_set: true
+    reload: true

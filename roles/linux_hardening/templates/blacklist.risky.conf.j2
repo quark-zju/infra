@@ -1,0 +1,11 @@
+# Managed by Ansible: linux_hardening
+# Disable risky or unnecessary kernel modules.
+
+{% for group in linux_hardening_module_groups %}
+# {{ group.comment }}
+{% if group.details is defined %}# {{ group.details }}
+{% endif %}{% for entry in group.entries %}install {{ entry.module }} /bin/false
+{% if entry.blacklist | default(false) %}blacklist {{ entry.module }}
+{% endif %}{% endfor %}
+{% if not loop.last %}
+{% endif %}{% endfor %}
