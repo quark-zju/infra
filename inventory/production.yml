@@ -5,6 +5,7 @@ all:
         localhost:
           ansible_connection: local
         sf:
+          ansible_user: root
         hz:
         opi:
     opi:
