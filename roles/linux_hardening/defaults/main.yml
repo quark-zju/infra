@@ -41,7 +41,6 @@ linux_hardening_module_groups:
       - dccp_ipv4
       - dccp_ipv6
       - sctp
-      - rds
       - tipc
 
   - comment: "HDLC TTY line discipline - CVE-2017-2636"
