@@ -31,6 +31,12 @@ Run hardening only for one host:
 ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/linux-hardening.yml --limit opi
 ```
 
+If `localhost` prompts for sudo password, run with `-K`:
+
+```bash
+ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/linux-hardening.yml --limit localhost -K
+```
+
 Run the OpenCode playbook:
 
 ```bash
