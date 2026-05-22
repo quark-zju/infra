@@ -1,5 +1,12 @@
 all:
   children:
+    linux:
+      hosts:
+        localhost:
+          ansible_connection: local
+        sf:
+        hz:
+        opi:
     opi:
       hosts:
         opi:
