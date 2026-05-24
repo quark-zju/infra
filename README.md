@@ -84,25 +84,25 @@ ansible opi -b -a 'journalctl -u opencode -n 50 --no-pager'
 
 Keep secrets out of the repo in plaintext. The role expects `opencode_server_password`.
 
-`ansible-vault` is recommended, not required. If `inventory/group_vars/opi/vault.yml` is kept out of Git, a plaintext file also works and Ansible will load it normally.
+`ansible-vault` is recommended, not required. If `inventory/group_vars/opi_nodes/vault.yml` is kept out of Git, a plaintext file also works and Ansible will load it normally.
 
 Create the variable file from the example:
 
 ```bash
-mkdir -p inventory/group_vars/opi
-cp inventory/group_vars/opi/vault.yml.example inventory/group_vars/opi/vault.yml
+mkdir -p inventory/group_vars/opi_nodes
+cp inventory/group_vars/opi_nodes/vault.yml.example inventory/group_vars/opi_nodes/vault.yml
 ```
 
 Edit the file before encrypting it:
 
 ```bash
-$EDITOR inventory/group_vars/opi/vault.yml
+$EDITOR inventory/group_vars/opi_nodes/vault.yml
 ```
 
 Encrypt it:
 
 ```bash
-ansible-vault encrypt inventory/group_vars/opi/vault.yml
+ansible-vault encrypt inventory/group_vars/opi_nodes/vault.yml
 ```
 
 If you keep it as plaintext instead, you can skip encryption and run the playbook without `--ask-vault-pass`.
@@ -110,22 +110,22 @@ If you keep it as plaintext instead, you can skip encryption and run the playboo
 Edit an encrypted file later:
 
 ```bash
-ansible-vault edit inventory/group_vars/opi/vault.yml
+ansible-vault edit inventory/group_vars/opi_nodes/vault.yml
 ```
 
 View it without modifying:
 
 ```bash
-ansible-vault view inventory/group_vars/opi/vault.yml
+ansible-vault view inventory/group_vars/opi_nodes/vault.yml
 ```
 
 Rekey it:
 
 ```bash
-ansible-vault rekey inventory/group_vars/opi/vault.yml
+ansible-vault rekey inventory/group_vars/opi_nodes/vault.yml
 ```
 
-The role also supports the older repo-root path `group_vars/opi/vault.yml` for compatibility, but new files should go under `inventory/group_vars/`.
+The role also supports the older repo-root path `group_vars/opi_nodes/vault.yml` for compatibility, but new files should go under `inventory/group_vars/`.
 
 If you prefer a local vault password file, save it outside the repo or in `.vault_pass.txt` and keep it untracked:
 

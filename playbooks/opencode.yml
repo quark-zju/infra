@@ -1,5 +1,5 @@
 - name: Install opencode on opi
-  hosts: opi
+  hosts: opi_nodes
   gather_facts: false
   become: true
   roles:

@@ -8,7 +8,7 @@ all:
           ansible_user: root
         hz:
         opi:
-    opi:
+    opi_nodes:
       hosts:
         opi:
           ansible_user: root
