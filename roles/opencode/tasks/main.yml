@@ -34,14 +34,23 @@
   changed_when: false
   failed_when: false
 
-- name: Install opencode globally
+- name: Parse installed opencode version from npm list output
+  ansible.builtin.set_fact:
+    opencode_installed_version: "{{ opencode_npm_list.stdout | regex_search('opencode-ai@[0-9]+\\.[0-9]+\\.[0-9]+') | default('', true) | regex_replace('^opencode-ai@', '') }}"
+  when: opencode_npm_list.rc == 0
+
+- name: Decide whether opencode upgrade is needed
+  ansible.builtin.set_fact:
+    opencode_upgrade_needed: "{{ (opencode_npm_list.rc != 0) or (opencode_installed_version is version(opencode_minimum_version, '<')) }}"
+
+- name: Install or upgrade opencode globally when below minimum version
   ansible.builtin.command:
     argv:
       - npm
       - install
       - -g
       - opencode-ai
-  when: opencode_npm_list.rc != 0
+  when: opencode_upgrade_needed
   notify: Restart opencode
 
 - name: Ensure opencode group exists
