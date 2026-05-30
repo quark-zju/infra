@@ -1,14 +1,16 @@
 # infra
 
-Ansible repo for managing personal machines like `opi`, `localhost`, and other Linux hosts.
+Ansible repo for managing personal machines like `opi`, `x13`, local macOS, and other hosts.
 
 ## Layout
 
 - `inventory/production.yml`: current inventory and groups
 - `playbooks/linux-hardening.yml`: baseline Linux security hardening for the `linux` group
+- `playbooks/macos-local.yml`: local macOS entry point, currently intentionally empty
 - `playbooks/opencode.yml`: installs and manages the OpenCode service on `opi`
 - `roles/linux_hardening/`: risky module blacklist + scoped ptrace policy
 - hardening sysctl file: `/etc/sysctl.d/99-linux-hardening.conf`
+- `roles/macos_local/`: placeholder for local macOS tasks
 - `roles/opencode/`: npm install, service account, env file, and systemd unit
 
 ## Common commands
@@ -31,10 +33,16 @@ Run hardening only for one host:
 ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/linux-hardening.yml --limit opi
 ```
 
-If `localhost` prompts for sudo password, run with `-K`:
+Run hardening for the Linux laptop:
 
 ```bash
-ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/linux-hardening.yml --limit localhost -K
+ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/linux-hardening.yml --limit x13 -K
+```
+
+Run the local macOS playbook:
+
+```bash
+ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/macos-local.yml
 ```
 
 Run the OpenCode playbook:
@@ -53,6 +61,7 @@ Syntax check:
 
 ```bash
 ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook --syntax-check playbooks/linux-hardening.yml
+ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook --syntax-check playbooks/macos-local.yml
 ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook --syntax-check playbooks/opencode.yml
 ```
 
@@ -135,6 +144,7 @@ ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/opencode.yml --vault-password
 
 ## Notes
 
+- `ansible.cfg` keeps Ansible home plus controller and target temporary files under `/tmp` so local macOS runs do not depend on `~/.ansible` being writable
 - `opencode` runs as its own system user and group
 - service home is `/home/opencode`
 - service env lives at `/etc/opencode/opencode.env`
