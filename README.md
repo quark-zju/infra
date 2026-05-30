@@ -1,16 +1,17 @@
 # infra
 
-Ansible repo for managing personal machines like `opi`, `x13`, local macOS, and other hosts.
+Ansible repo for managing personal machines like `opi`, `x13`, macOS, and other hosts.
 
 ## Layout
 
 - `inventory/production.yml`: current inventory and groups
 - `playbooks/linux-hardening.yml`: baseline Linux security hardening for the `linux` group
-- `playbooks/macos-local.yml`: local macOS entry point, currently intentionally empty
+- `playbooks/macos.yml`: SSH-managed macOS entry point, currently intentionally empty
+- `playbooks/macos-local.yml`: local-controller macOS entry point, currently intentionally empty
 - `playbooks/opencode.yml`: installs and manages the OpenCode service on `opi`
 - `roles/linux_hardening/`: risky module blacklist + scoped ptrace policy
 - hardening sysctl file: `/etc/sysctl.d/99-linux-hardening.conf`
-- `roles/macos_local/`: placeholder for local macOS tasks
+- `roles/macos/`: placeholder for shared macOS tasks
 - `roles/opencode/`: npm install, service account, env file, and systemd unit
 
 ## Common commands
@@ -39,7 +40,13 @@ Run hardening for the Linux laptop:
 ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/linux-hardening.yml --limit x13 -K
 ```
 
-Run the local macOS playbook:
+Run the SSH-managed macOS playbook:
+
+```bash
+ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/macos.yml
+```
+
+Run the local-controller macOS playbook:
 
 ```bash
 ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/macos-local.yml
@@ -61,6 +68,7 @@ Syntax check:
 
 ```bash
 ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook --syntax-check playbooks/linux-hardening.yml
+ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook --syntax-check playbooks/macos.yml
 ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook --syntax-check playbooks/macos-local.yml
 ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook --syntax-check playbooks/opencode.yml
 ```
