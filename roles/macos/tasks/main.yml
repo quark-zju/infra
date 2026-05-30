@@ -1,1 +1,12 @@
 ---
+- name: Ensure Hammerspoon config directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.user_dir }}/.hammerspoon"
+    state: directory
+    mode: "0755"
+
+- name: Install Hammerspoon init.lua
+  ansible.builtin.copy:
+    src: hammerspoon/init.lua
+    dest: "{{ ansible_facts.user_dir }}/.hammerspoon/init.lua"
+    mode: "0644"

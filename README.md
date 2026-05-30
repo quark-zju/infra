@@ -11,7 +11,7 @@ Ansible repo for managing personal machines like `opi`, `x13`, macOS, and other 
 - `playbooks/opencode.yml`: installs and manages the OpenCode service on `opi`
 - `roles/linux_hardening/`: risky module blacklist + scoped ptrace policy
 - hardening sysctl file: `/etc/sysctl.d/99-linux-hardening.conf`
-- `roles/macos/`: placeholder for shared macOS tasks
+- `roles/macos/`: shared macOS tasks, including Hammerspoon configuration
 - `roles/opencode/`: npm install, service account, env file, and systemd unit
 
 ## Common commands
