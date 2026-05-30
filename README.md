@@ -5,7 +5,7 @@ Ansible repo for managing personal machines like `opi`, `x13`, macOS, and other 
 ## Layout
 
 - `inventory/production.yml`: current inventory and groups
-- `playbooks/local.yml`: local-controller entry point that dispatches by detected OS
+- `playbooks/local.yml`: local machine entry point that dispatches by detected OS
 - `playbooks/linux-hardening.yml`: baseline Linux security hardening for the `linux` group
 - `playbooks/macos.yml`: SSH-managed macOS entry point, currently intentionally empty
 - `playbooks/opencode.yml`: installs and manages the OpenCode service on `opi`
@@ -25,52 +25,52 @@ ansible linux -m ping
 Run the Linux hardening playbook:
 
 ```bash
-ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/linux-hardening.yml
+ansible-playbook playbooks/linux-hardening.yml
 ```
 
 Run hardening only for one host:
 
 ```bash
-ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/linux-hardening.yml --limit opi
+ansible-playbook playbooks/linux-hardening.yml --limit opi
 ```
 
 Run hardening for the Linux laptop:
 
 ```bash
-ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/linux-hardening.yml --limit x13 -K
+ansible-playbook playbooks/linux-hardening.yml --limit x13 -K
 ```
 
 Run the SSH-managed macOS playbook:
 
 ```bash
-ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/macos.yml
+ansible-playbook playbooks/macos.yml
 ```
 
-Run the local-controller playbook:
+Run the local machine playbook:
 
 ```bash
-ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/local.yml
+ansible-playbook playbooks/local.yml
 ```
 
 Run the OpenCode playbook:
 
 ```bash
-ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/opencode.yml --ask-vault-pass
+ansible-playbook playbooks/opencode.yml --ask-vault-pass
 ```
 
 Dry-run the OpenCode playbook:
 
 ```bash
-ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/opencode.yml --check --ask-vault-pass
+ansible-playbook playbooks/opencode.yml --check --ask-vault-pass
 ```
 
 Syntax check:
 
 ```bash
-ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook --syntax-check playbooks/linux-hardening.yml
-ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook --syntax-check playbooks/local.yml
-ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook --syntax-check playbooks/macos.yml
-ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook --syntax-check playbooks/opencode.yml
+ansible-playbook --syntax-check playbooks/linux-hardening.yml
+ansible-playbook --syntax-check playbooks/local.yml
+ansible-playbook --syntax-check playbooks/macos.yml
+ansible-playbook --syntax-check playbooks/opencode.yml
 ```
 
 Check service status:
@@ -147,7 +147,7 @@ The role also supports the older repo-root path `group_vars/opi_nodes/vault.yml`
 If you prefer a local vault password file, save it outside the repo or in `.vault_pass.txt` and keep it untracked:
 
 ```bash
-ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/opencode.yml --vault-password-file .vault_pass.txt
+ansible-playbook playbooks/opencode.yml --vault-password-file .vault_pass.txt
 ```
 
 ## Notes
