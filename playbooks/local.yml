@@ -1,0 +1,16 @@
+---
+- name: Apply local machine baseline
+  hosts: local
+  gather_facts: true
+  tasks:
+    - name: Apply local macOS baseline
+      ansible.builtin.include_role:
+        name: macos
+      when: ansible_facts.system == "Darwin"
+
+    - name: Apply local Linux baseline
+      ansible.builtin.include_role:
+        name: linux_hardening
+        apply:
+          become: true
+      when: ansible_facts.system == "Linux"

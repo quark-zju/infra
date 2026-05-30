@@ -1,6 +1,6 @@
 all:
   children:
-    macos_local:
+    local:
       hosts:
         localhost:
           ansible_connection: local

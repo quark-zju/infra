@@ -1,6 +1,0 @@
----
-- name: Apply local macOS baseline
-  hosts: macos_local
-  gather_facts: true
-  roles:
-    - macos
