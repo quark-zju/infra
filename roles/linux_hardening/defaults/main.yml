@@ -1,6 +1,5 @@
 linux_hardening_modprobe_path: /etc/modprobe.d/blacklist.risky.conf
 linux_hardening_ptrace_scope: 1
-linux_hardening_unprivileged_userns_clone: 0
 linux_hardening_sysctl_file: /etc/sysctl.d/99-linux-hardening.conf
 
 linux_hardening_module_groups:

@@ -19,6 +19,6 @@
       value: "{{ linux_hardening_ptrace_scope }}"
     # CVE-2026-23111 nf_tables use-after-free
     - name: kernel.unprivileged_userns_clone
-      value: "{{ linux_hardening_unprivileged_userns_clone }}"
+      value: 0
   loop_control:
     extended: true
