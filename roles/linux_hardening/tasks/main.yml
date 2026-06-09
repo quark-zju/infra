@@ -16,7 +16,7 @@
     reload: "{{ ansible_loop.last }}"
   loop:
     - name: kernel.yama.ptrace_scope
-      value: "{{ linux_hardening_ptrace_scope }}"
+      value: 1
     # CVE-2026-23111 nf_tables use-after-free
     - name: kernel.unprivileged_userns_clone
       value: 0
