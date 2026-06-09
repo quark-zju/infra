@@ -14,3 +14,13 @@
     state: present
     sysctl_set: true
     reload: true
+
+# CVE-2026-23111 nf_tables use-after-free
+- name: Disable unprivileged user namespaces
+  ansible.posix.sysctl:
+    name: kernel.unprivileged_userns_clone
+    value: "{{ linux_hardening_unprivileged_userns_clone | string }}"
+    sysctl_file: "{{ linux_hardening_sysctl_file }}"
+    state: present
+    sysctl_set: true
+    reload: true
