@@ -6,21 +6,19 @@
     group: root
     mode: "0644"
 
-- name: Set scoped ptrace policy
+- name: Apply Linux hardening sysctl settings
   ansible.posix.sysctl:
-    name: kernel.yama.ptrace_scope
-    value: "{{ linux_hardening_ptrace_scope | string }}"
+    name: "{{ item.name }}"
+    value: "{{ item.value | string }}"
     sysctl_file: "{{ linux_hardening_sysctl_file }}"
     state: present
     sysctl_set: true
-    reload: true
-
-# CVE-2026-23111 nf_tables use-after-free
-- name: Disable unprivileged user namespaces
-  ansible.posix.sysctl:
-    name: kernel.unprivileged_userns_clone
-    value: "{{ linux_hardening_unprivileged_userns_clone | string }}"
-    sysctl_file: "{{ linux_hardening_sysctl_file }}"
-    state: present
-    sysctl_set: true
-    reload: true
+    reload: "{{ ansible_loop.last }}"
+  loop:
+    - name: kernel.yama.ptrace_scope
+      value: "{{ linux_hardening_ptrace_scope }}"
+    # CVE-2026-23111 nf_tables use-after-free
+    - name: kernel.unprivileged_userns_clone
+      value: "{{ linux_hardening_unprivileged_userns_clone }}"
+  loop_control:
+    extended: true
