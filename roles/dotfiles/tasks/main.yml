@@ -37,10 +37,15 @@
   changed_when: false
 
 - name: Install local git identity from dotfiles HEAD
-  ansible.builtin.template:
-    src: gitconfig.local.j2
-    dest: "{{ dotfiles_gitconfig_local_path }}"
+  ansible.builtin.blockinfile:
+    path: "{{ dotfiles_gitconfig_local_path }}"
+    create: true
     mode: "0644"
+    marker: "# {mark} ANSIBLE MANAGED DOTFILES GIT IDENTITY"
+    block: |
+      [user]
+        name = {{ dotfiles_head_author_name.stdout }}
+        email = {{ dotfiles_head_author_email.stdout }}
 
 - name: Ensure dotfile symlink parent directories exist
   ansible.builtin.file:
