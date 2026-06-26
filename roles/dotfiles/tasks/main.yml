@@ -42,10 +42,7 @@
     create: true
     mode: "0644"
     marker: "# {mark} ANSIBLE MANAGED DOTFILES GIT IDENTITY"
-    block: |
-      [user]
-        name = {{ dotfiles_head_author_name.stdout }}
-        email = {{ dotfiles_head_author_email.stdout }}
+    block: "{{ lookup('ansible.builtin.template', 'gitconfig.local.block.j2') }}"
 
 - name: Ensure dotfile symlink parent directories exist
   ansible.builtin.file:
