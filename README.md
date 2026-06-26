@@ -15,88 +15,44 @@ Ansible repo for managing personal machines like `opi`, `x13`, macOS, and other 
 - `roles/macos/`: shared macOS tasks, including Hammerspoon configuration
 - `roles/opencode/`: npm install, service account, env file, and systemd unit
 
-## Common commands
+## What Each Command Changes
 
-Check connectivity:
+Set `ANSIBLE_LOCAL_TEMP=/tmp` when running commands from this repo.
 
-```bash
-ansible linux -m ping
-```
+| Run from | Command | Affects | What changes |
+| --- | --- | --- | --- |
+| The machine you want to configure | `ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/local.yml` | `localhost`, through the `local` inventory group | Always applies the local dotfiles role on macOS/Linux: clones or updates `~/src/dotfiles`, writes `~/.gitconfig.local`, and manages dotfile symlinks. On macOS it also installs the Hammerspoon config. On Linux it also applies the Linux hardening role with `become`. |
+| Any machine that can SSH to all `linux` inventory hosts | `ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/linux-hardening.yml` | `x13`, `sf`, `hz`, and `opi` | Applies Linux hardening as root: writes the risky kernel module blacklist and hardening sysctl file. |
+| Any machine that can SSH to one Linux host | `ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/linux-hardening.yml --limit opi` | Only `opi` | Same Linux hardening role, limited to one host. Change `opi` to another inventory hostname as needed. |
+| Any machine that can SSH to `x13` and prompt for sudo | `ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/linux-hardening.yml --limit x13 -K` | Only `x13` | Same Linux hardening role, with `-K` prompting for the sudo password. |
+| Any machine that can SSH to the `macos` inventory host | `ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/macos.yml` | `mac` | Applies only the shared macOS role over SSH: installs the Hammerspoon config. It does not run the local dotfiles role. |
+| Any machine that can SSH to `opi` as root and read the vault secret | `ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/opencode.yml --ask-vault-pass` | `opi` | Installs and manages the OpenCode service: packages, service user, dotfiles/leash repos, Rust toolchain, config symlinks, `/etc/opencode/opencode.env`, systemd unit, and running service. |
+| Any machine that can SSH to `opi` as root and read the vault secret | `ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook playbooks/opencode.yml --check --ask-vault-pass` | `opi`, in check mode | Dry-runs the OpenCode playbook where modules support check mode. Use this to preview likely changes, not as a perfect guarantee. |
 
-Run the Linux hardening playbook:
-
-```bash
-ansible-playbook playbooks/linux-hardening.yml
-```
-
-Run hardening only for one host:
-
-```bash
-ansible-playbook playbooks/linux-hardening.yml --limit opi
-```
-
-Run hardening for the Linux laptop:
+Syntax checks only parse playbooks; they do not change target machines.
 
 ```bash
-ansible-playbook playbooks/linux-hardening.yml --limit x13 -K
+ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook --syntax-check playbooks/linux-hardening.yml
+ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook --syntax-check playbooks/local.yml
+ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook --syntax-check playbooks/macos.yml
+ANSIBLE_LOCAL_TEMP=/tmp ansible-playbook --syntax-check playbooks/opencode.yml
 ```
 
-Run the SSH-managed macOS playbook:
+## `ansible` vs `ansible-playbook`
 
-```bash
-ansible-playbook playbooks/macos.yml
-```
+Use `ansible-playbook` to apply the configured roles above. It reads a playbook, gathers facts when the playbook asks for them, evaluates `when` conditions, loads roles, uses handlers, and applies the desired state described in this repo.
 
-Run the local machine playbook:
+Use `ansible` for one-off ad-hoc commands. It targets hosts or groups from `inventory/production.yml`, but it does not automatically run this repo's playbooks or roles.
 
-```bash
-ansible-playbook playbooks/local.yml
-```
+| Command | Affects | What happens |
+| --- | --- | --- |
+| `ANSIBLE_LOCAL_TEMP=/tmp ansible linux -m ping` | `x13`, `sf`, `hz`, and `opi` | Runs only the `ping` module to test connectivity. No roles or config files are applied. |
+| `ANSIBLE_LOCAL_TEMP=/tmp ansible opi -a 'systemctl status opencode --no-pager'` | `opi` | Runs a read-only status command on `opi`. |
+| `ANSIBLE_LOCAL_TEMP=/tmp ansible opi -b -a 'systemctl restart opencode'` | `opi` | Runs exactly that command with privilege escalation. It restarts the service but does not update packages, configs, vault-backed env files, or systemd units. |
+| `ANSIBLE_LOCAL_TEMP=/tmp ansible opi -a 'ss -ltnp \| grep 4096'` | `opi` | Checks whether something is listening on port `4096`. |
+| `ANSIBLE_LOCAL_TEMP=/tmp ansible opi -b -a 'journalctl -u opencode -n 50 --no-pager'` | `opi` | Reads recent OpenCode service logs. |
 
-Run the OpenCode playbook:
-
-```bash
-ansible-playbook playbooks/opencode.yml --ask-vault-pass
-```
-
-Dry-run the OpenCode playbook:
-
-```bash
-ansible-playbook playbooks/opencode.yml --check --ask-vault-pass
-```
-
-Syntax check:
-
-```bash
-ansible-playbook --syntax-check playbooks/linux-hardening.yml
-ansible-playbook --syntax-check playbooks/local.yml
-ansible-playbook --syntax-check playbooks/macos.yml
-ansible-playbook --syntax-check playbooks/opencode.yml
-```
-
-Check service status:
-
-```bash
-ansible opi -a 'systemctl status opencode --no-pager'
-```
-
-Restart the service:
-
-```bash
-ansible opi -b -a 'systemctl restart opencode'
-```
-
-Check listening port:
-
-```bash
-ansible opi -a 'ss -ltnp | grep 4096'
-```
-
-View recent logs:
-
-```bash
-ansible opi -b -a 'journalctl -u opencode -n 50 --no-pager'
-```
+If the goal is to converge a machine to the configuration in this repository, use `ansible-playbook`. If the goal is to inspect or poke a machine once, use `ansible`.
 
 ## ansible-vault
 
