@@ -3,6 +3,11 @@
   hosts: local
   gather_facts: true
   tasks:
+    - name: Apply local dotfiles baseline
+      ansible.builtin.include_role:
+        name: dotfiles
+      when: ansible_facts.system in ["Darwin", "Linux"]
+
     - name: Apply local macOS baseline
       ansible.builtin.include_role:
         name: macos

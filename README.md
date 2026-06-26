@@ -9,6 +9,7 @@ Ansible repo for managing personal machines like `opi`, `x13`, macOS, and other 
 - `playbooks/linux-hardening.yml`: baseline Linux security hardening for the `linux` group
 - `playbooks/macos.yml`: SSH-managed macOS entry point, currently intentionally empty
 - `playbooks/opencode.yml`: installs and manages the OpenCode service on `opi`
+- `roles/dotfiles/`: local macOS/Linux dotfiles clone, symlinks, and Git identity
 - `roles/linux_hardening/`: risky module blacklist + scoped ptrace policy
 - hardening sysctl file: `/etc/sysctl.d/99-linux-hardening.conf`
 - `roles/macos/`: shared macOS tasks, including Hammerspoon configuration

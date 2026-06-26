@@ -1,0 +1,71 @@
+---
+- name: Ensure source directory exists
+  ansible.builtin.file:
+    path: "{{ dotfiles_repo_dest | dirname }}"
+    state: directory
+    mode: "0755"
+
+- name: Clone dotfiles repository
+  ansible.builtin.git:
+    repo: "{{ dotfiles_repo_url }}"
+    dest: "{{ dotfiles_repo_dest }}"
+    version: HEAD
+    update: true
+
+- name: Read dotfiles HEAD author name
+  ansible.builtin.command:
+    argv:
+      - git
+      - -C
+      - "{{ dotfiles_repo_dest }}"
+      - log
+      - -1
+      - --format=%an
+  register: dotfiles_head_author_name
+  changed_when: false
+
+- name: Read dotfiles HEAD author email
+  ansible.builtin.command:
+    argv:
+      - git
+      - -C
+      - "{{ dotfiles_repo_dest }}"
+      - log
+      - -1
+      - --format=%ae
+  register: dotfiles_head_author_email
+  changed_when: false
+
+- name: Install local git identity from dotfiles HEAD
+  ansible.builtin.template:
+    src: gitconfig.local.j2
+    dest: "{{ dotfiles_gitconfig_local_path }}"
+    mode: "0644"
+
+- name: Ensure dotfile symlink parent directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop: "{{ dotfiles_link_parent_dirs }}"
+
+- name: Install dotfile symlinks
+  ansible.builtin.file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    state: link
+    force: true
+  loop: "{{ dotfiles_links }}"
+
+- name: Check whether Codex config directory exists
+  ansible.builtin.stat:
+    path: "{{ ansible_facts.user_dir }}/.codex"
+  register: dotfiles_codex_config_dir
+
+- name: Link Codex AGENTS.md into dotfiles opencode config
+  ansible.builtin.file:
+    src: "{{ dotfiles_codex_agents_link.src }}"
+    dest: "{{ dotfiles_codex_agents_link.dest }}"
+    state: link
+    force: true
+  when: dotfiles_codex_config_dir.stat.isdir | default(false)
