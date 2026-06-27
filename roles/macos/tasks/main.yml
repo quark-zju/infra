@@ -5,12 +5,6 @@
   changed_when: false
   check_mode: false
 
-- name: Get current user UID
-  ansible.builtin.command: id -u
-  register: macos_user_uid
-  changed_when: false
-  check_mode: false
-
 - name: Check Homebrew formulae
   ansible.builtin.command: "{{ macos_brew_path.stdout }} list --formula {{ item }}"
   loop:
@@ -30,7 +24,6 @@
   ansible.builtin.command: "{{ macos_brew_path.stdout }} list --cask {{ item }}"
   loop:
     - font-jetbrains-maple-mono-nf
-    - linearmouse
     - zed
   register: macos_homebrew_casks
   changed_when: false
@@ -53,7 +46,7 @@
   failed_when: macos_natural_scrolling.rc not in [0, 1]
   check_mode: false
 
-- name: Ensure trackpad uses natural scrolling globally
+- name: Ensure natural scrolling is disabled globally
   ansible.builtin.command:
     argv:
       - defaults
@@ -61,51 +54,8 @@
       - NSGlobalDomain
       - com.apple.swipescrolldirection
       - -bool
-      - "true"
-  when: macos_natural_scrolling.stdout != "1"
-
-- name: Ensure LinearMouse config directory exists
-  ansible.builtin.file:
-    path: "{{ ansible_facts.user_dir }}/.config/linearmouse"
-    state: directory
-    mode: "0755"
-
-- name: Configure LinearMouse mouse scroll direction
-  ansible.builtin.copy:
-    dest: "{{ ansible_facts.user_dir }}/.config/linearmouse/linearmouse.json"
-    mode: "0644"
-    content: |
-      {
-        "$schema": "https://schema.linearmouse.app/0.10.0",
-        "schemes": [
-          {
-            "if": {
-              "device": {
-                "category": "trackpad"
-              }
-            },
-            "scrolling": {
-              "reverse": {
-                "vertical": false,
-                "horizontal": false
-              }
-            }
-          },
-          {
-            "if": {
-              "device": {
-                "category": "mouse"
-              }
-            },
-            "scrolling": {
-              "reverse": {
-                "vertical": true,
-                "horizontal": true
-              }
-            }
-          }
-        ]
-      }
+      - "false"
+  when: macos_natural_scrolling.stdout != "0"
 
 - name: Ensure Hammerspoon config directory exists
   ansible.builtin.file:
