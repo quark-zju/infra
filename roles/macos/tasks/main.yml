@@ -5,6 +5,12 @@
   changed_when: false
   check_mode: false
 
+- name: Get current user UID
+  ansible.builtin.command: id -u
+  register: macos_user_uid
+  changed_when: false
+  check_mode: false
+
 - name: Check Homebrew formulae
   ansible.builtin.command: "{{ macos_brew_path.stdout }} list --formula {{ item }}"
   loop:
@@ -64,6 +70,56 @@
     state: directory
     mode: "0755"
 
+- name: Ensure LaunchAgents directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.user_dir }}/Library/LaunchAgents"
+    state: directory
+    mode: "0755"
+
+- name: Install LinearMouse LaunchAgent
+  ansible.builtin.copy:
+    dest: "{{ ansible_facts.user_dir }}/Library/LaunchAgents/com.lujjjh.LinearMouse.plist"
+    mode: "0644"
+    content: |
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+      <plist version="1.0">
+      <dict>
+        <key>Label</key>
+        <string>com.lujjjh.LinearMouse</string>
+        <key>ProgramArguments</key>
+        <array>
+          <string>/usr/bin/open</string>
+          <string>-gja</string>
+          <string>LinearMouse</string>
+        </array>
+        <key>RunAtLoad</key>
+        <true/>
+      </dict>
+      </plist>
+  notify: Restart LinearMouse
+
+- name: Check LinearMouse LaunchAgent state
+  ansible.builtin.command:
+    argv:
+      - launchctl
+      - print
+      - "gui/{{ macos_user_uid.stdout }}/com.lujjjh.LinearMouse"
+  register: macos_linearmouse_launchagent
+  changed_when: false
+  failed_when: macos_linearmouse_launchagent.rc not in [0, 113]
+  check_mode: false
+
+- name: Load LinearMouse LaunchAgent
+  ansible.builtin.command:
+    argv:
+      - launchctl
+      - bootstrap
+      - "gui/{{ macos_user_uid.stdout }}"
+      - "{{ ansible_facts.user_dir }}/Library/LaunchAgents/com.lujjjh.LinearMouse.plist"
+  when: macos_linearmouse_launchagent.rc == 113
+  notify: Restart LinearMouse
+
 - name: Configure LinearMouse mouse scroll direction
   ansible.builtin.copy:
     dest: "{{ ansible_facts.user_dir }}/.config/linearmouse/linearmouse.json"
@@ -100,6 +156,7 @@
           }
         ]
       }
+  notify: Restart LinearMouse
 
 - name: Ensure Hammerspoon config directory exists
   ansible.builtin.file:

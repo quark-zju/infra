@@ -1,0 +1,12 @@
+---
+- name: Stop LinearMouse
+  ansible.builtin.command: /usr/bin/killall LinearMouse
+  register: macos_linearmouse_stop
+  changed_when: macos_linearmouse_stop.rc == 0
+  failed_when: macos_linearmouse_stop.rc not in [0, 1]
+  listen: Restart LinearMouse
+
+- name: Start LinearMouse
+  ansible.builtin.command: /usr/bin/open -gja LinearMouse
+  changed_when: false
+  listen: Restart LinearMouse
