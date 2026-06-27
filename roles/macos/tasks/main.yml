@@ -23,6 +23,7 @@
 - name: Check Homebrew casks
   ansible.builtin.command: "{{ macos_brew_path.stdout }} list --cask {{ item }}"
   loop:
+    - font-jetbrains-maple-mono-nf
     - linearmouse
     - zed
   register: macos_homebrew_casks
