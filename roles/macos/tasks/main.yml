@@ -5,16 +5,34 @@
   changed_when: false
   check_mode: false
 
-- name: Check whether LinearMouse is installed
-  ansible.builtin.command: "{{ macos_brew_path.stdout }} list --cask linearmouse"
-  register: macos_linearmouse_installed
+- name: Check Homebrew formulae
+  ansible.builtin.command: "{{ macos_brew_path.stdout }} list --formula {{ item }}"
+  loop:
+    - neovim
+    - pyenv
+    - ripgrep
+  register: macos_homebrew_formulae
   changed_when: false
-  failed_when: macos_linearmouse_installed.rc not in [0, 1]
+  failed_when: macos_homebrew_formulae.rc not in [0, 1]
   check_mode: false
 
-- name: Install LinearMouse
-  ansible.builtin.command: "{{ macos_brew_path.stdout }} install --cask linearmouse"
-  when: macos_linearmouse_installed.rc == 1
+- name: Install Homebrew formulae
+  ansible.builtin.command: "{{ macos_brew_path.stdout }} install {{ item }}"
+  loop: "{{ macos_homebrew_formulae.results | selectattr('rc', 'equalto', 1) | map(attribute='item') | list }}"
+
+- name: Check Homebrew casks
+  ansible.builtin.command: "{{ macos_brew_path.stdout }} list --cask {{ item }}"
+  loop:
+    - linearmouse
+    - zed
+  register: macos_homebrew_casks
+  changed_when: false
+  failed_when: macos_homebrew_casks.rc not in [0, 1]
+  check_mode: false
+
+- name: Install Homebrew casks
+  ansible.builtin.command: "{{ macos_brew_path.stdout }} install --cask {{ item }}"
+  loop: "{{ macos_homebrew_casks.results | selectattr('rc', 'equalto', 1) | map(attribute='item') | list }}"
 
 - name: Check natural scrolling preference
   ansible.builtin.command:
