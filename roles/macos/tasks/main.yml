@@ -1,4 +1,74 @@
 ---
+- name: Locate Homebrew
+  ansible.builtin.command: /bin/zsh -lc 'command -v brew'
+  register: macos_brew_path
+  changed_when: false
+  check_mode: false
+
+- name: Check whether LinearMouse is installed
+  ansible.builtin.command: "{{ macos_brew_path.stdout }} list --cask linearmouse"
+  register: macos_linearmouse_installed
+  changed_when: false
+  failed_when: macos_linearmouse_installed.rc not in [0, 1]
+  check_mode: false
+
+- name: Install LinearMouse
+  ansible.builtin.command: "{{ macos_brew_path.stdout }} install --cask linearmouse"
+  when: macos_linearmouse_installed.rc == 1
+
+- name: Check natural scrolling preference
+  ansible.builtin.command:
+    argv:
+      - defaults
+      - read
+      - NSGlobalDomain
+      - com.apple.swipescrolldirection
+  register: macos_natural_scrolling
+  changed_when: false
+  failed_when: macos_natural_scrolling.rc not in [0, 1]
+  check_mode: false
+
+- name: Ensure trackpad uses natural scrolling globally
+  ansible.builtin.command:
+    argv:
+      - defaults
+      - write
+      - NSGlobalDomain
+      - com.apple.swipescrolldirection
+      - -bool
+      - "true"
+  when: macos_natural_scrolling.stdout != "1"
+
+- name: Ensure LinearMouse config directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts.user_dir }}/.config/linearmouse"
+    state: directory
+    mode: "0755"
+
+- name: Configure LinearMouse mouse scroll direction
+  ansible.builtin.copy:
+    dest: "{{ ansible_facts.user_dir }}/.config/linearmouse/linearmouse.json"
+    mode: "0644"
+    content: |
+      {
+        "$schema": "https://schema.linearmouse.app/0.10.0",
+        "schemes": [
+          {
+            "if": {
+              "device": {
+                "category": "mouse"
+              }
+            },
+            "scrolling": {
+              "reverse": {
+                "vertical": true,
+                "horizontal": true
+              }
+            }
+          }
+        ]
+      }
+
 - name: Ensure Hammerspoon config directory exists
   ansible.builtin.file:
     path: "{{ ansible_facts.user_dir }}/.hammerspoon"
