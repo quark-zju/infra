@@ -75,6 +75,19 @@
           {
             "if": {
               "device": {
+                "category": "trackpad"
+              }
+            },
+            "scrolling": {
+              "reverse": {
+                "vertical": false,
+                "horizontal": false
+              }
+            }
+          },
+          {
+            "if": {
+              "device": {
                 "category": "mouse"
               }
             },
