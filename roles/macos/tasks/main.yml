@@ -24,6 +24,7 @@
   ansible.builtin.command: "{{ macos_brew_path.stdout }} list --cask {{ item }}"
   loop:
     - font-jetbrains-maple-mono-nf
+    - hammerspoon
     - zed
   register: macos_homebrew_casks
   changed_when: false
