@@ -32,7 +32,7 @@
   check_mode: false
 
 - name: Install Homebrew casks
-  ansible.builtin.command: "{{ macos_brew_path.stdout }} install --cask {{ item }}"
+  ansible.builtin.command: "{{ macos_brew_path.stdout }} install --cask --adopt {{ item }}"
   loop: "{{ macos_homebrew_casks.results | selectattr('rc', 'equalto', 1) | map(attribute='item') | list }}"
 
 - name: Check natural scrolling preference
