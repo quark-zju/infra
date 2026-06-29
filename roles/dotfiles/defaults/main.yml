@@ -18,8 +18,16 @@ dotfiles_links:
     src: src/dotfiles/.gitconfig
   - dest: "{{ ansible_facts.user_dir }}/.config/git-hooks"
     src: ../src/dotfiles/.config/git-hooks
-  - dest: "{{ ansible_facts.user_dir }}/.config/opencode"
-    src: ../src/dotfiles/.config/opencode
+
+dotfiles_opencode_config_dir: "{{ ansible_facts.user_dir }}/.config/opencode"
+
+dotfiles_opencode_links:
+  - dest: "{{ dotfiles_opencode_config_dir }}/AGENTS.md"
+    src: ../../src/dotfiles/.config/opencode/AGENTS.md
+  - dest: "{{ dotfiles_opencode_config_dir }}/opencode.json"
+    src: ../../src/dotfiles/.config/opencode/opencode.json
+  - dest: "{{ dotfiles_opencode_config_dir }}/plugins"
+    src: ../../src/dotfiles/.config/opencode/plugins"
 
 dotfiles_codex_agents_link:
   dest: "{{ ansible_facts.user_dir }}/.codex/AGENTS.md"
