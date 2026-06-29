@@ -104,10 +104,22 @@
     force: true
   loop: "{{ dotfiles_opencode_links }}"
 
-- name: Check whether Codex config directory exists
-  ansible.builtin.stat:
-    path: "{{ ansible_facts.user_dir }}/.codex"
-  register: dotfiles_codex_config_dir
+- name: Ensure Codex config directory exists
+  ansible.builtin.file:
+    path: "{{ dotfiles_codex_config_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Disable Codex analytics
+  ansible.builtin.blockinfile:
+    path: "{{ dotfiles_codex_config_path }}"
+    create: true
+    mode: "0644"
+    marker: "# {mark} ANSIBLE MANAGED CODEX ANALYTICS"
+    block: |
+      # https://www.reddit.com/r/codex/comments/1ucnd5y/codex_almost_made_me_worry_about_my_ssd_so_i/
+      [analytics]
+      enabled = {{ dotfiles_codex_config_analytics_enabled | bool | lower }}
 
 - name: Link Codex AGENTS.md into dotfiles opencode config
   ansible.builtin.file:
@@ -115,4 +127,3 @@
     dest: "{{ dotfiles_codex_agents_link.dest }}"
     state: link
     force: true
-  when: dotfiles_codex_config_dir.stat.isdir | default(false)

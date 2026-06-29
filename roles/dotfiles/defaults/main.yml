@@ -3,6 +3,9 @@ dotfiles_repo_url: https://github.com/quark-zju/dotfiles.git
 dotfiles_repo_dest: "{{ ansible_facts.user_dir }}/src/dotfiles"
 
 dotfiles_gitconfig_local_path: "{{ ansible_facts.user_dir }}/.gitconfig.local"
+dotfiles_codex_config_dir: "{{ ansible_facts.user_dir }}/.codex"
+dotfiles_codex_config_path: "{{ dotfiles_codex_config_dir }}/config.toml"
+dotfiles_codex_config_analytics_enabled: false
 
 dotfiles_link_parent_dirs:
   - "{{ ansible_facts.user_dir }}/.config"
@@ -30,5 +33,5 @@ dotfiles_opencode_links:
     src: ../../src/dotfiles/.config/opencode/plugins"
 
 dotfiles_codex_agents_link:
-  dest: "{{ ansible_facts.user_dir }}/.codex/AGENTS.md"
+  dest: "{{ dotfiles_codex_config_dir }}/AGENTS.md"
   src: ../src/dotfiles/.config/opencode/AGENTS.md
