@@ -5,9 +5,40 @@
     state: directory
     mode: "0755"
 
+- name: Check whether dotfiles repository exists
+  ansible.builtin.stat:
+    path: "{{ dotfiles_repo_dest }}/.git"
+  register: dotfiles_repo_git_dir
+
+- name: Read existing dotfiles repository origin URL
+  ansible.builtin.command:
+    argv:
+      - git
+      - -C
+      - "{{ dotfiles_repo_dest }}"
+      - config
+      - --get
+      - remote.origin.url
+  register: dotfiles_repo_origin_url
+  changed_when: false
+  failed_when: false
+  when: dotfiles_repo_git_dir.stat.exists
+
 - name: Clone dotfiles repository
   ansible.builtin.git:
-    repo: "{{ dotfiles_repo_url }}"
+    repo: >-
+      {{
+        dotfiles_repo_origin_url.stdout
+        if (
+          dotfiles_repo_git_dir.stat.exists
+          and dotfiles_repo_origin_url.stdout is defined
+          and (
+            dotfiles_repo_origin_url.stdout.startswith('git@')
+            or dotfiles_repo_origin_url.stdout.startswith('ssh://')
+          )
+        )
+        else dotfiles_repo_url
+      }}
     dest: "{{ dotfiles_repo_dest }}"
     version: HEAD
     update: true
