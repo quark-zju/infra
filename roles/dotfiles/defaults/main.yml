@@ -30,7 +30,7 @@ dotfiles_opencode_links:
   - dest: "{{ dotfiles_opencode_config_dir }}/opencode.json"
     src: ../../src/dotfiles/.config/opencode/opencode.json
   - dest: "{{ dotfiles_opencode_config_dir }}/plugins"
-    src: ../../src/dotfiles/.config/opencode/plugins"
+    src: ../../src/dotfiles/.config/opencode/plugins
 
 dotfiles_codex_agents_link:
   dest: "{{ dotfiles_codex_config_dir }}/AGENTS.md"
