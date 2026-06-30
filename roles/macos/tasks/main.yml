@@ -58,6 +58,30 @@
       - "false"
   when: macos_natural_scrolling.stdout != "0"
 
+- name: Check Safari quit keyboard shortcut
+  ansible.builtin.command:
+    argv:
+      - defaults
+      - read
+      - com.apple.Safari
+      - NSUserKeyEquivalents
+  register: macos_safari_keyboard_shortcuts
+  changed_when: false
+  failed_when: macos_safari_keyboard_shortcuts.rc not in [0, 1]
+  check_mode: false
+
+- name: Configure Safari quit keyboard shortcut
+  ansible.builtin.command:
+    argv:
+      - defaults
+      - write
+      - com.apple.Safari
+      - NSUserKeyEquivalents
+      - -dict-add
+      - Quit Safari
+      - "@$q"
+  when: '"\"Quit Safari\" = \"@$q\";" not in macos_safari_keyboard_shortcuts.stdout'
+
 - name: Ensure Hammerspoon config directory exists
   ansible.builtin.file:
     path: "{{ ansible_facts.user_dir }}/.hammerspoon"

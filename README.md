@@ -12,18 +12,18 @@ Ansible repo for managing personal machines like `opi`, `x13`, macOS, and other 
 - `roles/dotfiles/`: local macOS/Linux dotfiles clone, symlinks, and Git identity
 - `roles/linux_hardening/`: risky module blacklist + scoped ptrace policy
 - hardening sysctl file: `/etc/sysctl.d/99-linux-hardening.conf`
-- `roles/macos/`: shared macOS tasks, including Homebrew packages, system scroll direction, and Hammerspoon configuration
+- `roles/macos/`: shared macOS tasks, including Homebrew packages, system scroll direction, Safari keyboard shortcuts, and Hammerspoon configuration
 - `roles/opencode/`: npm install, service account, env file, and systemd unit
 
 ## What Each Command Changes
 
 | Run from | Command | Affects | What changes |
 | --- | --- | --- | --- |
-| The machine you want to configure | `ansible-playbook playbooks/local.yml` | `localhost`, through the `local` inventory group | Always applies the local dotfiles role on macOS/Linux: clones or updates `~/src/dotfiles`, writes `~/.gitconfig.local`, and manages dotfile symlinks. On macOS it also installs Homebrew packages including Neovim, Zed, Hammerspoon, pyenv, ripgrep, and JetBrains Maple Mono NF; disables natural scrolling globally; and installs the Hammerspoon config. On Linux it also applies the Linux hardening role with `become`. |
+| The machine you want to configure | `ansible-playbook playbooks/local.yml` | `localhost`, through the `local` inventory group | Always applies the local dotfiles role on macOS/Linux: clones or updates `~/src/dotfiles`, writes `~/.gitconfig.local`, and manages dotfile symlinks. On macOS it also installs Homebrew packages including Neovim, Zed, Hammerspoon, pyenv, ripgrep, and JetBrains Maple Mono NF; disables natural scrolling globally; sets Safari's quit shortcut to Command+Shift+Q; and installs the Hammerspoon config. On Linux it also applies the Linux hardening role with `become`. |
 | Any machine that can SSH to all `linux` inventory hosts | `ansible-playbook playbooks/linux-hardening.yml` | `x13`, `sf`, `hz`, and `opi` | Applies Linux hardening as root: writes the risky kernel module blacklist and hardening sysctl file. |
 | Any machine that can SSH to one Linux host | `ansible-playbook playbooks/linux-hardening.yml --limit opi` | Only `opi` | Same Linux hardening role, limited to one host. Change `opi` to another inventory hostname as needed. |
 | Any machine that can SSH to `x13` and prompt for sudo | `ansible-playbook playbooks/linux-hardening.yml --limit x13 -K` | Only `x13` | Same Linux hardening role, with `-K` prompting for the sudo password. |
-| Any machine that can SSH to the `macos` inventory host | `ansible-playbook playbooks/macos.yml` | `mac` | Applies only the shared macOS role over SSH: installs Homebrew packages including Neovim, Zed, Hammerspoon, pyenv, ripgrep, and JetBrains Maple Mono NF; disables natural scrolling globally; and installs the Hammerspoon config. It does not run the local dotfiles role. |
+| Any machine that can SSH to the `macos` inventory host | `ansible-playbook playbooks/macos.yml` | `mac` | Applies only the shared macOS role over SSH: installs Homebrew packages including Neovim, Zed, Hammerspoon, pyenv, ripgrep, and JetBrains Maple Mono NF; disables natural scrolling globally; sets Safari's quit shortcut to Command+Shift+Q; and installs the Hammerspoon config. It does not run the local dotfiles role. |
 | Any machine that can SSH to `opi` as root and read the vault secret | `ansible-playbook playbooks/opencode.yml --ask-vault-pass` | `opi` | Installs and manages the OpenCode service: packages, service user, dotfiles/leash repos, Rust toolchain, config symlinks, `/etc/opencode/opencode.env`, systemd unit, and running service. |
 | Any machine that can SSH to `opi` as root and read the vault secret | `ansible-playbook playbooks/opencode.yml --check --ask-vault-pass` | `opi`, in check mode | Dry-runs the OpenCode playbook where modules support check mode. Use this to preview likely changes, not as a perfect guarantee. |
 
