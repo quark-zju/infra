@@ -58,26 +58,47 @@
       - "false"
   when: macos_natural_scrolling.stdout != "0"
 
-- name: Check global custom keyboard shortcuts
+- name: Check global Safari quit keyboard shortcut
+  ansible.builtin.command:
+    argv:
+      - /usr/libexec/PlistBuddy
+      - -c
+      - Print :NSUserKeyEquivalents:Quit\ Safari
+      - "{{ ansible_facts.user_dir }}/Library/Preferences/.GlobalPreferences.plist"
+  register: macos_global_safari_quit_keyboard_shortcut
+  changed_when: false
+  failed_when: macos_global_safari_quit_keyboard_shortcut.rc not in [0, 1]
+  check_mode: false
+
+- name: Remove global Safari quit keyboard shortcut
+  ansible.builtin.command:
+    argv:
+      - /usr/libexec/PlistBuddy
+      - -c
+      - Delete :NSUserKeyEquivalents:Quit\ Safari
+      - "{{ ansible_facts.user_dir }}/Library/Preferences/.GlobalPreferences.plist"
+  when: macos_global_safari_quit_keyboard_shortcut.rc == 0
+
+- name: Check Safari custom keyboard shortcuts
   ansible.builtin.command:
     argv:
       - /usr/libexec/PlistBuddy
       - -c
       - Print :NSUserKeyEquivalents
-      - "{{ ansible_facts.user_dir }}/Library/Preferences/.GlobalPreferences.plist"
-  register: macos_global_keyboard_shortcuts
+      - "{{ ansible_facts.user_dir }}/Library/Containers/com.apple.Safari/Data/Library/Preferences/com.apple.Safari.plist"
+  register: macos_safari_keyboard_shortcuts
   changed_when: false
-  failed_when: macos_global_keyboard_shortcuts.rc not in [0, 1]
+  failed_when: macos_safari_keyboard_shortcuts.rc not in [0, 1]
   check_mode: false
 
-- name: Ensure global custom keyboard shortcuts dictionary exists
+- name: Ensure Safari custom keyboard shortcuts dictionary exists
   ansible.builtin.command:
     argv:
       - /usr/libexec/PlistBuddy
       - -c
       - Add :NSUserKeyEquivalents dict
-      - "{{ ansible_facts.user_dir }}/Library/Preferences/.GlobalPreferences.plist"
-  when: macos_global_keyboard_shortcuts.rc == 1
+      - "{{ ansible_facts.user_dir }}/Library/Containers/com.apple.Safari/Data/Library/Preferences/com.apple.Safari.plist"
+  when: macos_safari_keyboard_shortcuts.rc == 1
 
 - name: Check Safari quit keyboard shortcut
   ansible.builtin.command:
@@ -85,7 +106,7 @@
       - /usr/libexec/PlistBuddy
       - -c
       - Print :NSUserKeyEquivalents:Quit\ Safari
-      - "{{ ansible_facts.user_dir }}/Library/Preferences/.GlobalPreferences.plist"
+      - "{{ ansible_facts.user_dir }}/Library/Containers/com.apple.Safari/Data/Library/Preferences/com.apple.Safari.plist"
   register: macos_safari_quit_keyboard_shortcut
   changed_when: false
   failed_when: macos_safari_quit_keyboard_shortcut.rc not in [0, 1]
@@ -97,7 +118,7 @@
       - /usr/libexec/PlistBuddy
       - -c
       - Add :NSUserKeyEquivalents:Quit\ Safari string @$q
-      - "{{ ansible_facts.user_dir }}/Library/Preferences/.GlobalPreferences.plist"
+      - "{{ ansible_facts.user_dir }}/Library/Containers/com.apple.Safari/Data/Library/Preferences/com.apple.Safari.plist"
   when: macos_safari_quit_keyboard_shortcut.rc == 1
 
 - name: Update Safari quit keyboard shortcut
@@ -106,7 +127,7 @@
       - /usr/libexec/PlistBuddy
       - -c
       - Set :NSUserKeyEquivalents:Quit\ Safari @$q
-      - "{{ ansible_facts.user_dir }}/Library/Preferences/.GlobalPreferences.plist"
+      - "{{ ansible_facts.user_dir }}/Library/Containers/com.apple.Safari/Data/Library/Preferences/com.apple.Safari.plist"
   when:
     - macos_safari_quit_keyboard_shortcut.rc == 0
     - macos_safari_quit_keyboard_shortcut.stdout != "@$q"
