@@ -35,6 +35,31 @@
   ansible.builtin.command: "{{ macos_brew_path.stdout }} install --cask --adopt {{ item }}"
   loop: "{{ macos_homebrew_casks.results | selectattr('rc', 'equalto', 1) | map(attribute='item') | list }}"
 
+- name: Check GUI application PATH
+  ansible.builtin.command:
+    argv:
+      - launchctl
+      - getenv
+      - PATH
+  register: macos_gui_path
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Configure GUI applications to use current PATH
+  ansible.builtin.command:
+    argv:
+      - launchctl
+      - config
+      - user
+      - path
+      - "{{ ansible_env.PATH }}"
+  become: true
+  when:
+    - ansible_env.PATH is defined
+    - ansible_env.PATH | length > 0
+    - macos_gui_path.stdout != ansible_env.PATH
+
 - name: Check natural scrolling preference
   ansible.builtin.command:
     argv:
