@@ -47,18 +47,31 @@
   check_mode: false
 
 - name: Configure GUI applications to use current PATH
-  ansible.builtin.command:
-    argv:
-      - launchctl
-      - config
-      - user
-      - path
-      - "{{ ansible_env.PATH }}"
-  become: true
   when:
-    - ansible_env.PATH is defined
-    - ansible_env.PATH | length > 0
-    - macos_gui_path.stdout != ansible_env.PATH
+    - ansible_facts.env.PATH is defined
+    - ansible_facts.env.PATH | length > 0
+    - macos_gui_path.stdout != ansible_facts.env.PATH
+  block:
+    - name: Configure launchd user PATH
+      ansible.builtin.command:
+        argv:
+          - launchctl
+          - config
+          - user
+          - path
+          - "{{ ansible_facts.env.PATH }}"
+      become: true
+
+  rescue:
+    - name: Report missing sudo password for GUI PATH configuration
+      ansible.builtin.debug:
+        msg: "Skipping GUI PATH configuration because launchctl config user path requires sudo. Re-run ansible-playbook with --ask-become-pass or -K to apply it."
+      when: 'ansible_failed_result.msg is search("sudo: a password is required")'
+
+    - name: Fail unexpected GUI PATH configuration errors
+      ansible.builtin.fail:
+        msg: "{{ ansible_failed_result.msg }}"
+      when: 'ansible_failed_result.msg is not search("sudo: a password is required")'
 
 - name: Check natural scrolling preference
   ansible.builtin.command:
