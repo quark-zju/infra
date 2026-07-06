@@ -137,10 +137,24 @@
       [analytics]
       enabled = {{ dotfiles_codex_config_analytics_enabled | bool | lower }}
 
-- name: Link Codex AGENTS.md into dotfiles opencode config
+- name: Link Codex AGENTS.md to dotfiles AGENTS.md
   ansible.builtin.file:
     src: "{{ dotfiles_codex_agents_link.src }}"
     dest: "{{ dotfiles_codex_agents_link.dest }}"
+    state: link
+    force: true
+    follow: false
+
+- name: Ensure Zed config directory exists
+  ansible.builtin.file:
+    path: "{{ dotfiles_zed_config_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Link Zed AGENTS.md to dotfiles AGENTS.md
+  ansible.builtin.file:
+    src: "{{ dotfiles_zed_agents_link.src }}"
+    dest: "{{ dotfiles_zed_agents_link.dest }}"
     state: link
     force: true
     follow: false

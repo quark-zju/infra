@@ -9,6 +9,7 @@ dotfiles_cargo_config_source_path: "{{ dotfiles_repo_dest }}/.cargo/config.toml"
 dotfiles_codex_config_dir: "{{ ansible_facts.user_dir }}/.codex"
 dotfiles_codex_config_path: "{{ dotfiles_codex_config_dir }}/config.toml"
 dotfiles_codex_config_analytics_enabled: false
+dotfiles_agents_source: "{{ dotfiles_repo_dest }}/.config/opencode/AGENTS.md"
 
 dotfiles_link_parent_dirs:
   - "{{ ansible_facts.user_dir }}/.config"
@@ -26,10 +27,11 @@ dotfiles_links:
     src: ../src/dotfiles/.config/git-hooks
 
 dotfiles_opencode_config_dir: "{{ ansible_facts.user_dir }}/.config/opencode"
+dotfiles_zed_config_dir: "{{ ansible_facts.user_dir }}/.config/zed"
 
 dotfiles_opencode_links:
   - dest: "{{ dotfiles_opencode_config_dir }}/AGENTS.md"
-    src: ../../src/dotfiles/.config/opencode/AGENTS.md
+    src: "{{ dotfiles_agents_source }}"
   - dest: "{{ dotfiles_opencode_config_dir }}/opencode.json"
     src: ../../src/dotfiles/.config/opencode/opencode.json
   - dest: "{{ dotfiles_opencode_config_dir }}/plugins"
@@ -37,4 +39,8 @@ dotfiles_opencode_links:
 
 dotfiles_codex_agents_link:
   dest: "{{ dotfiles_codex_config_dir }}/AGENTS.md"
-  src: ../src/dotfiles/.config/opencode/AGENTS.md
+  src: "{{ dotfiles_agents_source }}"
+
+dotfiles_zed_agents_link:
+  dest: "{{ dotfiles_zed_config_dir }}/AGENTS.md"
+  src: "{{ dotfiles_agents_source }}"
