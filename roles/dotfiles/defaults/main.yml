@@ -3,6 +3,7 @@ dotfiles_repo_url: https://github.com/quark-zju/dotfiles.git
 dotfiles_repo_dest: "{{ ansible_facts.user_dir }}/src/dotfiles"
 
 dotfiles_gitconfig_local_path: "{{ ansible_facts.user_dir }}/.gitconfig.local"
+dotfiles_gitignore_global_path: "{{ ansible_facts.user_dir }}/.gitignore_global"
 dotfiles_cargo_config_dir: "{{ ansible_facts.user_dir }}/.cargo"
 dotfiles_cargo_config_path: "{{ dotfiles_cargo_config_dir }}/config.toml"
 dotfiles_cargo_config_source_path: "{{ dotfiles_repo_dest }}/.cargo/config.toml"

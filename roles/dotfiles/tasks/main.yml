@@ -75,6 +75,18 @@
     marker: "# {mark} ANSIBLE MANAGED DOTFILES GIT IDENTITY"
     block: "{{ lookup('ansible.builtin.template', 'gitconfig.local.block.j2') }}"
 
+- name: Install global gitignore entries
+  ansible.builtin.blockinfile:
+    path: "{{ dotfiles_gitignore_global_path }}"
+    create: true
+    mode: "0644"
+    marker: "# {mark} ANSIBLE MANAGED DOTFILES GITIGNORE"
+    block: |
+      .DS_Store
+      target
+      __pycache__
+      *.swp
+
 - name: Ensure Cargo config directory exists
   ansible.builtin.file:
     path: "{{ dotfiles_cargo_config_dir }}"
