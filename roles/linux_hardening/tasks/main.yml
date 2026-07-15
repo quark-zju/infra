@@ -5,6 +5,16 @@
       - min
   when: ansible_facts.distribution is not defined
 
+- name: Install Debian hardening packages
+  ansible.builtin.apt:
+    name:
+      - unattended-upgrades
+      - sshguard
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  when: ansible_facts.distribution == "Debian"
+
 - name: Enable automatic reboot after unattended upgrades on Debian
   ansible.builtin.copy:
     content: |
