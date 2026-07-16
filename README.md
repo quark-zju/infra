@@ -1,19 +1,20 @@
 # infra
 
-Ansible repo for managing personal machines like `opi`, `x13`, macOS, and other hosts.
+Ansible repo for personal configurations.
 
-## Layout
+## Common commands
 
-- `inventory/production.yml`: current inventory and groups
-- `playbooks/local.yml`: local machine entry point that dispatches by detected OS
-- `playbooks/linux-hardening.yml`: baseline Linux security hardening for the `linux` group
-- `playbooks/macos.yml`: SSH-managed macOS entry point for shared macOS baseline
-- `playbooks/opencode.yml`: installs and manages the OpenCode service on `opi`
-- `roles/dotfiles/`: local macOS/Linux dotfiles clone, symlinks, and Git identity
-- `roles/linux_hardening/`: risky module blacklist + scoped ptrace policy
-- hardening sysctl file: `/etc/sysctl.d/99-linux-hardening.conf`
-- `roles/macos/`: shared macOS tasks, including Homebrew packages, system scroll direction, Safari keyboard shortcuts, and Hammerspoon configuration
-- `roles/opencode/`: npm install, service account, env file, and systemd unit
+```bash
+# Update configs of the local machine (macOS or Linux)
+# (consider running `sudo -v` first to update sudo timestamp)
+ansible-playbook playbooks/local.yml
+
+# Update configs of remote Linux hosts
+# (use --limit a:b to select hosts)
+ansible-playbook playbooks/linux-hardening.yml
+```
+
+----
 
 ## What Each Command Changes
 
