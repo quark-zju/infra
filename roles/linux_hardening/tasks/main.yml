@@ -1,9 +1,15 @@
-- name: Gather distribution fact
+- name: Gather distribution and kernel facts
   ansible.builtin.setup:
-    filter: ansible_distribution
+    filter:
+      - ansible_distribution
+      - ansible_distribution_release
+      - ansible_kernel
     gather_subset:
       - min
-  when: ansible_facts.distribution is not defined
+  when: >-
+    ansible_facts.distribution is not defined or
+    ansible_facts.distribution_release is not defined or
+    ansible_facts.kernel is not defined
 
 - name: Install Debian hardening packages
   ansible.builtin.apt:
@@ -33,19 +39,86 @@
     group: root
     mode: "0644"
 
-- name: Apply Linux hardening sysctl settings
+- name: Read running Debian kernel source version
+  ansible.builtin.command:
+    argv:
+      - dpkg-query
+      - --show
+      - "--showformat=${source:Version}"
+      - "linux-image-{{ ansible_facts.kernel }}"
+  register: linux_hardening_debian_kernel_source_version
+  changed_when: false
+  failed_when: false
+  when:
+    - ansible_facts.distribution == "Debian"
+    - >-
+      ansible_facts.distribution_release in
+      linux_hardening_cve_2026_23111_debian_fixed_versions
+
+- name: Check running Debian kernel CVE-2026-23111 fix version
+  ansible.builtin.command:
+    argv:
+      - dpkg
+      - --compare-versions
+      - "{{ linux_hardening_debian_kernel_source_version.stdout }}"
+      - ge
+      - >-
+        {{ linux_hardening_cve_2026_23111_debian_fixed_versions[
+          ansible_facts.distribution_release
+        ] }}
+  register: linux_hardening_debian_kernel_fixed_version_check
+  changed_when: false
+  failed_when: false
+  when:
+    - not linux_hardening_debian_kernel_source_version.skipped | default(false)
+    - linux_hardening_debian_kernel_source_version.rc == 0
+    - linux_hardening_debian_kernel_source_version.stdout | length > 0
+
+- name: Normalize running kernel version for CVE-2026-23111 check
+  ansible.builtin.set_fact:
+    linux_hardening_running_kernel_version: >-
+      {{ ansible_facts.kernel | regex_search('^[0-9]+\.[0-9]+\.[0-9]+') }}
+    linux_hardening_running_kernel_branch: >-
+      {{ ansible_facts.kernel | regex_search('^[0-9]+\.[0-9]+') }}
+
+- name: Determine whether running kernel has CVE-2026-23111 fix
+  ansible.builtin.set_fact:
+    linux_hardening_cve_2026_23111_fixed: >-
+      {{
+        (
+          linux_hardening_running_kernel_branch in
+          linux_hardening_cve_2026_23111_generic_fixed_versions and
+          linux_hardening_running_kernel_version is version(
+            linux_hardening_cve_2026_23111_generic_fixed_versions[
+              linux_hardening_running_kernel_branch
+            ],
+            '>='
+          )
+        ) or
+        (
+          linux_hardening_running_kernel_version is version('6.19.0', '>=') and
+          '-rc' not in ansible_facts.kernel
+        ) or
+        (
+          linux_hardening_debian_kernel_fixed_version_check.rc | default(1) == 0
+        )
+      }}
+
+- name: Apply baseline Linux hardening sysctl setting
   ansible.posix.sysctl:
-    name: "{{ item.name }}"
-    value: "{{ item.value | string }}"
+    name: kernel.yama.ptrace_scope
+    value: "1"
     sysctl_file: "{{ linux_hardening_sysctl_file }}"
     state: present
     sysctl_set: true
-    reload: "{{ ansible_loop.last }}"
-  loop:
-    - name: kernel.yama.ptrace_scope
-      value: 1
-    # CVE-2026-23111 nf_tables use-after-free
-    - name: kernel.unprivileged_userns_clone
-      value: 0
-  loop_control:
-    extended: true
+    reload: true
+
+- name: Mitigate CVE-2026-23111 on unpatched kernels
+  ansible.posix.sysctl:
+    name: kernel.unprivileged_userns_clone
+    value: "0"
+    sysctl_file: "{{ linux_hardening_sysctl_file }}"
+    state: >-
+      {{ 'absent' if linux_hardening_cve_2026_23111_fixed else 'present' }}
+    sysctl_set: "{{ not linux_hardening_cve_2026_23111_fixed }}"
+    reload: true
