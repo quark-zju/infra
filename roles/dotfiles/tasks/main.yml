@@ -83,6 +83,7 @@
     marker: "# {mark} ANSIBLE MANAGED DOTFILES GITIGNORE"
     block: |
       .DS_Store
+      .codex
       target
       __pycache__
       *.swp
