@@ -108,7 +108,7 @@ ansible-playbook playbooks/opencode.yml --vault-password-file .vault_pass.txt
 
 ## Notes
 
-- `ansible.cfg` keeps Ansible home plus controller and target temporary files under `/tmp` so local macOS runs do not depend on `~/.ansible` being writable
+- `ansible.cfg` keeps controller temporary files under `/tmp` so local macOS runs do not depend on `~/.ansible/tmp` being writable
 - `opencode` runs as its own system user and group
 - service home is `/home/opencode`
 - service env lives at `/etc/opencode/opencode.env`
