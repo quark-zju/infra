@@ -267,9 +267,17 @@
       {{ lookup(
         'ansible.builtin.first_found',
         {
-          'files': [
-            inventory_dir ~ '/group_vars/' ~ inventory_hostname ~ '/vault.yml',
-            playbook_dir ~ '/../group_vars/' ~ inventory_hostname ~ '/vault.yml'
+          'files': (
+            [inventory_hostname ~ '/vault.yml']
+            + (
+              group_names
+              | map('regex_replace', '$', '/vault.yml')
+              | list
+            )
+          ),
+          'paths': [
+            inventory_dir ~ '/group_vars',
+            playbook_dir ~ '/../group_vars'
           ]
         },
         errors='ignore'
@@ -278,7 +286,7 @@
 - name: Load opencode vault variables
   ansible.builtin.include_vars:
     file: "{{ opencode_vault_file }}"
-  when: opencode_vault_file | length > 0
+  when: opencode_vault_file | default('', true) | length > 0
 
 - name: Require opencode server password
   ansible.builtin.assert:
