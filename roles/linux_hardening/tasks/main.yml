@@ -113,12 +113,26 @@
     sysctl_set: true
     reload: true
 
+- name: Check whether unprivileged user namespace sysctl is available
+  ansible.builtin.stat:
+    path: /proc/sys/kernel/unprivileged_userns_clone
+  register: linux_hardening_unprivileged_userns_clone_sysctl
+
 - name: Mitigate CVE-2026-23111 on unpatched kernels
   ansible.posix.sysctl:
     name: kernel.unprivileged_userns_clone
     value: "0"
     sysctl_file: "{{ linux_hardening_sysctl_file }}"
     state: >-
-      {{ 'absent' if linux_hardening_cve_2026_23111_fixed else 'present' }}
-    sysctl_set: "{{ not linux_hardening_cve_2026_23111_fixed }}"
+      {{
+        'present'
+        if not linux_hardening_cve_2026_23111_fixed and
+          linux_hardening_unprivileged_userns_clone_sysctl.stat.exists
+        else 'absent'
+      }}
+    sysctl_set: >-
+      {{
+        not linux_hardening_cve_2026_23111_fixed and
+        linux_hardening_unprivileged_userns_clone_sysctl.stat.exists
+      }}
     reload: true
