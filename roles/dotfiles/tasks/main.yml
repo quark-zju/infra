@@ -133,6 +133,20 @@
     follow: false
   loop: "{{ dotfiles_opencode_links }}"
 
+- name: Check whether kimi code config directory exists
+  ansible.builtin.stat:
+    path: "{{ dotfiles_kimi_code_config_dir }}"
+  register: dotfiles_kimi_code_config_dir_stat
+
+- name: Link kimi code AGENTS.md to dotfiles AGENTS.md
+  ansible.builtin.file:
+    src: "{{ dotfiles_kimi_code_agents_link.src }}"
+    dest: "{{ dotfiles_kimi_code_agents_link.dest }}"
+    state: link
+    force: true
+    follow: false
+  when: dotfiles_kimi_code_config_dir_stat.stat.exists
+
 - name: Ensure Codex config directory exists
   ansible.builtin.file:
     path: "{{ dotfiles_codex_config_dir }}"

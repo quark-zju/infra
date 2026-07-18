@@ -28,6 +28,7 @@ dotfiles_links:
     src: ../src/dotfiles/.config/git-hooks
 
 dotfiles_opencode_config_dir: "{{ ansible_facts.user_dir }}/.config/opencode"
+dotfiles_kimi_code_config_dir: "{{ ansible_facts.user_dir }}/.kimi-code"
 dotfiles_zed_config_dir: "{{ ansible_facts.user_dir }}/.config/zed"
 
 dotfiles_opencode_links:
@@ -40,6 +41,10 @@ dotfiles_opencode_links:
 
 dotfiles_codex_agents_link:
   dest: "{{ dotfiles_codex_config_dir }}/AGENTS.md"
+  src: "{{ dotfiles_agents_source }}"
+
+dotfiles_kimi_code_agents_link:
+  dest: "{{ dotfiles_kimi_code_config_dir }}/AGENTS.md"
   src: "{{ dotfiles_agents_source }}"
 
 dotfiles_zed_agents_link:
