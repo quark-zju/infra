@@ -18,6 +18,8 @@ Environment=TMPDIR=/tmp
 Environment=AGENT_BROWSER_EXECUTABLE_PATH=/usr/bin/chromium
 Environment=PATH=/home/opencode/.cargo/bin:/home/opencode/.npm/global/bin:/home/opencode/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 EnvironmentFile={{ opencode_env_file }}
+# Leash reuses PID 2 in each PID namespace, so Kimi can mistake a stale PID-based lock for a running server.
+ExecStartPre=/usr/bin/rm -f {{ opencode_home }}/.kimi-code/server/lock
 ExecStart={{ opencode_leash_bin }} run {{ opencode_npm_prefix.stdout }}/bin/kimi web --foreground --no-open --keep-alive --host {{ kimi_web_hostname }} --port {{ kimi_web_port }} --log-level {{ kimi_log_level }}
 Restart=always
 RestartSec={{ opencode_restart_sec }}
