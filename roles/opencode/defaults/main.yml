@@ -27,3 +27,4 @@ opencode_start_limit_burst: 5
 opencode_memory_high: 650M
 opencode_memory_max: 800M
 opencode_minimum_version: 1.18.2
+kimi_minimum_version: 0.27.0

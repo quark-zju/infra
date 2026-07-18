@@ -53,6 +53,36 @@
   when: opencode_upgrade_needed
   notify: Restart opencode
 
+- name: Check whether kimi code is already installed globally
+  ansible.builtin.command:
+    argv:
+      - npm
+      - list
+      - -g
+      - "@moonshot-ai/kimi-code"
+      - --depth=0
+  register: kimi_npm_list
+  changed_when: false
+  failed_when: false
+
+- name: Parse installed kimi code version from npm list output
+  ansible.builtin.set_fact:
+    kimi_installed_version: "{{ kimi_npm_list.stdout | regex_search('@moonshot-ai/kimi-code@[0-9]+\\.[0-9]+\\.[0-9]+') | default('', true) | regex_replace('^@moonshot-ai/kimi-code@', '') }}"
+  when: kimi_npm_list.rc == 0
+
+- name: Decide whether kimi code upgrade is needed
+  ansible.builtin.set_fact:
+    kimi_upgrade_needed: "{{ (kimi_npm_list.rc != 0) or (kimi_installed_version is version(kimi_minimum_version, '<')) }}"
+
+- name: Install or upgrade kimi code globally when below minimum version
+  ansible.builtin.command:
+    argv:
+      - npm
+      - install
+      - -g
+      - "@moonshot-ai/kimi-code"
+  when: kimi_upgrade_needed
+
 - name: Ensure opencode group exists
   ansible.builtin.group:
     name: "{{ opencode_group }}"
