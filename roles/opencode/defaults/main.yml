@@ -28,3 +28,7 @@ opencode_memory_high: 650M
 opencode_memory_max: 800M
 opencode_minimum_version: 1.18.2
 kimi_minimum_version: 0.27.0
+kimi_service_name: kimi
+kimi_web_hostname: 0.0.0.0
+kimi_web_port: 58627
+kimi_log_level: error

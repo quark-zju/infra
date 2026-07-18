@@ -1,0 +1,40 @@
+[Unit]
+Description=Kimi Web
+After=network.target
+StartLimitIntervalSec={{ opencode_start_limit_interval_sec }}
+StartLimitBurst={{ opencode_start_limit_burst }}
+
+[Service]
+Type=simple
+User={{ opencode_user }}
+Group={{ opencode_group }}
+RuntimeDirectory=user/{{ opencode_user_uid }}
+RuntimeDirectoryMode=0700
+RuntimeDirectoryPreserve=yes
+WorkingDirectory={{ opencode_src_dir }}
+Environment=HOME={{ opencode_home }}
+Environment=XDG_RUNTIME_DIR=/run/user/{{ opencode_user_uid }}
+Environment=TMPDIR=/tmp
+Environment=AGENT_BROWSER_EXECUTABLE_PATH=/usr/bin/chromium
+Environment=PATH=/home/opencode/.cargo/bin:/home/opencode/.npm/global/bin:/home/opencode/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ExecStart={{ opencode_leash_bin }} run {{ opencode_npm_prefix.stdout }}/bin/kimi web --foreground --no-open --host {{ kimi_web_hostname }} --port {{ kimi_web_port }} --log-level {{ kimi_log_level }}
+Restart=always
+RestartSec={{ opencode_restart_sec }}
+OOMPolicy=continue
+MemoryMax={{ opencode_memory_max }}
+MemoryHigh={{ opencode_memory_high }}
+# NoNewPrivileges=true
+# PrivateTmp=true
+ProtectSystem=full
+# ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX AF_NETLINK
+LockPersonality=true
+RestrictRealtime=true
+# RestrictNamespaces=true
+ReadWritePaths={{ opencode_home }}
+ReadWritePaths=/run/user/{{ opencode_user_uid }}
+
+[Install]
+WantedBy=multi-user.target

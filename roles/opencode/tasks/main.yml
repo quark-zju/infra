@@ -82,6 +82,7 @@
       - -g
       - "@moonshot-ai/kimi-code"
   when: kimi_upgrade_needed
+  notify: Restart kimi
 
 - name: Ensure opencode group exists
   ansible.builtin.group:
@@ -351,6 +352,24 @@
 - name: Ensure opencode service is enabled and started
   ansible.builtin.systemd:
     name: "{{ opencode_service_name }}"
+    enabled: true
+    state: started
+    daemon_reload: true
+
+- name: Install kimi systemd unit
+  ansible.builtin.template:
+    src: kimi.service.j2
+    dest: /etc/systemd/system/{{ kimi_service_name }}.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Reload systemd
+    - Restart kimi
+
+- name: Ensure kimi service is enabled and started
+  ansible.builtin.systemd:
+    name: "{{ kimi_service_name }}"
     enabled: true
     state: started
     daemon_reload: true

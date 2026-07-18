@@ -6,3 +6,8 @@
   ansible.builtin.systemd:
     name: "{{ opencode_service_name }}"
     state: restarted
+
+- name: Restart kimi
+  ansible.builtin.systemd:
+    name: "{{ kimi_service_name }}"
+    state: restarted
