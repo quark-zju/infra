@@ -98,6 +98,14 @@
     home: "{{ opencode_home }}"
     shell: /bin/zsh
 
+- name: Enable linger for opencode user
+  ansible.builtin.command:
+    argv:
+      - loginctl
+      - enable-linger
+      - "{{ opencode_user }}"
+    creates: /var/lib/systemd/linger/{{ opencode_user }}
+
 - name: Read opencode passwd entry
   ansible.builtin.getent:
     database: passwd
