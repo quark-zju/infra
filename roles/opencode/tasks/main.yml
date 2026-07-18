@@ -246,6 +246,23 @@
     owner: "{{ opencode_user }}"
     group: "{{ opencode_group }}"
 
+- name: Ensure kimi code config directory exists
+  ansible.builtin.file:
+    path: "{{ opencode_home }}/.kimi-code"
+    state: directory
+    owner: "{{ opencode_user }}"
+    group: "{{ opencode_group }}"
+    mode: "0700"
+
+- name: Link kimi code AGENTS.md
+  ansible.builtin.file:
+    src: "{{ opencode_dotfiles_dir }}/.config/opencode/AGENTS.md"
+    dest: "{{ opencode_home }}/.kimi-code/AGENTS.md"
+    state: link
+    force: true
+    owner: "{{ opencode_user }}"
+    group: "{{ opencode_group }}"
+
 - name: Ensure opencode config directory exists
   ansible.builtin.file:
     path: "{{ opencode_home }}/.config/opencode"
