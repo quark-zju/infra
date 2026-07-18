@@ -254,14 +254,15 @@
     group: "{{ opencode_group }}"
     mode: "0700"
 
-- name: Link kimi code AGENTS.md
-  ansible.builtin.file:
-    src: "{{ opencode_dotfiles_dir }}/.config/opencode/AGENTS.md"
-    dest: "{{ opencode_home }}/.kimi-code/AGENTS.md"
-    state: link
-    force: true
-    owner: "{{ opencode_user }}"
-    group: "{{ opencode_group }}"
+- name: Install kimi code dotfiles links
+  ansible.builtin.include_role:
+    name: dotfiles
+    tasks_from: kimi_code_agents
+  vars:
+    dotfiles_agents_source: "{{ opencode_dotfiles_dir }}/.config/opencode/AGENTS.md"
+    dotfiles_kimi_code_config_dir: "{{ opencode_home }}/.kimi-code"
+    dotfiles_kimi_code_link_owner: "{{ opencode_user }}"
+    dotfiles_kimi_code_link_group: "{{ opencode_group }}"
 
 - name: Ensure opencode config directory exists
   ansible.builtin.file:

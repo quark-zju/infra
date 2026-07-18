@@ -43,10 +43,6 @@ dotfiles_codex_agents_link:
   dest: "{{ dotfiles_codex_config_dir }}/AGENTS.md"
   src: "{{ dotfiles_agents_source }}"
 
-dotfiles_kimi_code_agents_link:
-  dest: "{{ dotfiles_kimi_code_config_dir }}/AGENTS.md"
-  src: "{{ dotfiles_agents_source }}"
-
 dotfiles_zed_agents_link:
   dest: "{{ dotfiles_zed_config_dir }}/AGENTS.md"
   src: "{{ dotfiles_agents_source }}"

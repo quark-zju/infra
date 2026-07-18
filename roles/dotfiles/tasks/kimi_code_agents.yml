@@ -6,8 +6,8 @@
 
 - name: Link kimi code AGENTS.md to dotfiles AGENTS.md
   ansible.builtin.file:
-    src: "{{ dotfiles_kimi_code_agents_link.src }}"
-    dest: "{{ dotfiles_kimi_code_agents_link.dest }}"
+    src: "{{ dotfiles_agents_source }}"
+    dest: "{{ dotfiles_kimi_code_config_dir }}/AGENTS.md"
     state: link
     force: true
     follow: false
