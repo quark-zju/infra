@@ -25,7 +25,7 @@ ansible-playbook playbooks/linux-hardening.yml
 | Any machine that can SSH to one Linux host | `ansible-playbook playbooks/linux-hardening.yml --limit opi` | Only `opi` | Same Linux hardening role, limited to one host. Change `opi` to another inventory hostname as needed. |
 | Any machine that can SSH to `x13` and prompt for sudo | `ansible-playbook playbooks/linux-hardening.yml --limit x13 -K` | Only `x13` | Same Linux hardening role, with `-K` prompting for the sudo password. |
 | Any machine that can SSH to the `macos` inventory host | `ansible-playbook playbooks/macos.yml` | `mac` | Applies only the shared macOS role over SSH: installs Homebrew packages including Neovim, Zed, Hammerspoon, pyenv, ripgrep, and JetBrains Maple Mono NF; configures GUI apps to inherit the current PATH when run with sudo access; disables natural scrolling globally; sets Safari's quit shortcut to Command+Shift+Q; and installs the Hammerspoon config. Use `-K` if Ansible needs to prompt for the sudo password. It does not run the local dotfiles role. |
-| Any machine that can SSH to `opi` as root and read the vault secret | `ansible-playbook playbooks/opencode.yml --ask-vault-pass` | `opi` | Installs and manages the OpenCode service: packages, service user, dotfiles/leash repos, Rust toolchain, config symlinks, `/etc/opencode/opencode.env`, systemd unit, and running service. |
+| Any machine that can SSH to `opi` as root and read the vault secret | `ansible-playbook playbooks/opencode.yml --ask-vault-pass` | `opi` | Installs and manages the OpenCode and Kimi web services: npm packages, service user, dotfiles/leash repos, Rust toolchain, config symlinks, `/etc/opencode/opencode.env`, systemd units, and running services. |
 | Any machine that can SSH to `opi` as root and read the vault secret | `ansible-playbook playbooks/opencode.yml --check --ask-vault-pass` | `opi`, in check mode | Dry-runs the OpenCode playbook where modules support check mode. Use this to preview likely changes, not as a perfect guarantee. |
 
 Syntax checks only parse playbooks; they do not change target machines.
@@ -47,9 +47,12 @@ Use `ansible` for one-off ad-hoc commands. It targets hosts or groups from `inve
 | --- | --- | --- |
 | `ansible linux -m ping` | `x13`, `sf`, `hz`, and `opi` | Runs only the `ping` module to test connectivity. No roles or config files are applied. |
 | `ansible opi -a 'systemctl status opencode --no-pager'` | `opi` | Runs a read-only status command on `opi`. |
+| `ansible opi -a 'systemctl status kimi --no-pager'` | `opi` | Runs a read-only Kimi service status command on `opi`. |
 | `ansible opi -b -a 'systemctl restart opencode'` | `opi` | Runs exactly that command with privilege escalation. It restarts the service but does not update packages, configs, vault-backed env files, or systemd units. |
 | `ansible opi -a 'ss -ltnp \| grep 4096'` | `opi` | Checks whether something is listening on port `4096`. |
+| `ansible opi -a 'ss -ltnp \| grep 58627'` | `opi` | Checks whether Kimi web is listening on port `58627`. |
 | `ansible opi -b -a 'journalctl -u opencode -n 50 --no-pager'` | `opi` | Reads recent OpenCode service logs. |
+| `ansible opi -b -a 'journalctl -u kimi -n 50 --no-pager'` | `opi` | Reads recent Kimi web service logs, including the startup bearer-token URL. |
 
 If the goal is to converge a machine to the configuration in this repository, use `ansible-playbook`. If the goal is to inspect or poke a machine once, use `ansible`.
 
@@ -109,7 +112,8 @@ ansible-playbook playbooks/opencode.yml --vault-password-file .vault_pass.txt
 ## Notes
 
 - `ansible.cfg` keeps controller temporary files under `/tmp` so local macOS runs do not depend on `~/.ansible/tmp` being writable
-- `opencode` runs as its own system user and group
+- `opencode` and `kimi` run as the dedicated `opencode` system user and group
 - service home is `/home/opencode`
 - service env lives at `/etc/opencode/opencode.env`
-- default web bind is `0.0.0.0:4096`
+- OpenCode binds to `0.0.0.0:4096` and Kimi web binds to `0.0.0.0:58627` by default
+- both web services run inside the leash sandbox
