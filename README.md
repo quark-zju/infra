@@ -113,6 +113,7 @@ ansible-playbook playbooks/opencode.yml --vault-password-file .vault_pass.txt
 
 - `ansible.cfg` keeps controller temporary files under `/tmp` so local macOS runs do not depend on `~/.ansible/tmp` being writable
 - `opencode` and `kimi` run as the dedicated `opencode` system user and group
+- linger is enabled for the `opencode` user so `/run/user/<uid>` remains available without an interactive login
 - service home is `/home/opencode`
 - the root-only service environment lives at `/etc/opencode/opencode.env`; Kimi reuses the OpenCode server password and disables telemetry
 - OpenCode binds to `0.0.0.0:4096` and Kimi web binds to `0.0.0.0:58627` by default
