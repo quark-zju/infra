@@ -32,3 +32,4 @@ kimi_service_name: kimi
 kimi_web_hostname: 0.0.0.0
 kimi_web_port: 58627
 kimi_log_level: error
+kimi_code_allowed_hosts: .0x1e31.net
