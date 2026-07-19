@@ -15,10 +15,16 @@
   ansible.builtin.apt:
     name:
       - unattended-upgrades
-      - sshguard
+      - fail2ban
     state: present
     update_cache: true
     cache_valid_time: 3600
+  when: ansible_facts.distribution == "Debian"
+
+- name: Remove SSHGuard from Debian
+  ansible.builtin.apt:
+    name: sshguard
+    state: absent
   when: ansible_facts.distribution == "Debian"
 
 - name: Enable automatic reboot after unattended upgrades on Debian
