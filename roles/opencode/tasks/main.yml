@@ -361,8 +361,6 @@
     content: |
       OPENCODE_SERVER_PASSWORD={{ opencode_server_password | to_json }}
       OPENCODE_ENABLE_EXA=1
-      # Kimi Code uses kimi-code.bearer.${credential} as its WebSocket subprotocol, so the name must be valid.
-      KIMI_CODE_PASSWORD={{ opencode_server_password | regex_replace('[^A-Za-z0-9._-]', '-') | to_json }}
       KIMI_CODE_ALLOWED_HOSTS={{ kimi_code_allowed_hosts | to_json }}
       KIMI_DISABLE_TELEMETRY=1
   no_log: true
