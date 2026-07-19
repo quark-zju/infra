@@ -1,0 +1,12 @@
+# private LAN
+{% for network in opencode_private_lan_networks %}
+IPAddressDeny={{ network }}
+{% endfor %}
+
+# systemd-resolved
+{% for address in opencode_resolved_addresses %}
+IPAddressAllow={{ address }}
+{% endfor %}
+
+# sibling (proxy pass incoming)
+IPAddressAllow={{ opencode_sibling_proxy_address }}

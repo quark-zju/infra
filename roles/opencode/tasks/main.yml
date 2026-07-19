@@ -5,6 +5,7 @@
       - fuse3
       - gh
       - git
+      - iproute2
       - npm
       - python-is-python3
       - ripgrep
@@ -368,6 +369,55 @@
   notify:
     - Restart opencode
     - Restart kimi
+
+- name: Determine primary IPv4 address
+  ansible.builtin.command:
+    argv:
+      - ip
+      - -4
+      - route
+      - get
+      - 1.1.1.1
+  register: opencode_primary_ipv4_route
+  changed_when: false
+
+- name: Parse primary IPv4 address
+  ansible.builtin.set_fact:
+    opencode_primary_ipv4_addresses: >-
+      {{
+        opencode_primary_ipv4_route.stdout
+        | regex_findall('(?:^|\\s)src\\s+([0-9]+(?:\\.[0-9]+){3})(?:\\s|$)')
+      }}
+
+- name: Require one primary IPv4 address
+  ansible.builtin.assert:
+    that:
+      - opencode_primary_ipv4_addresses | length == 1
+    fail_msg: >-
+      Could not determine one primary IPv4 address from
+      "ip -4 route get 1.1.1.1": {{ opencode_primary_ipv4_route.stdout }}
+
+- name: Parse primary IPv4 octets
+  ansible.builtin.set_fact:
+    opencode_primary_ipv4_octets: "{{ opencode_primary_ipv4_addresses[0].split('.') }}"
+
+- name: Require room for sibling proxy subnet
+  ansible.builtin.assert:
+    that:
+      - opencode_primary_ipv4_octets[2] | int < 255
+    fail_msg: >-
+      Cannot derive the sibling proxy address from {{ opencode_primary_ipv4_addresses[0] }}:
+      its third octet cannot be incremented.
+
+- name: Derive sibling proxy address
+  ansible.builtin.set_fact:
+    opencode_sibling_proxy_address: >-
+      {{
+        opencode_primary_ipv4_octets[0]
+        ~ '.' ~ opencode_primary_ipv4_octets[1]
+        ~ '.' ~ ((opencode_primary_ipv4_octets[2] | int) + 1)
+        ~ '.1'
+      }}
 
 - name: Install opencode systemd unit
   ansible.builtin.template:

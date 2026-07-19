@@ -33,6 +33,7 @@ ProtectSystem=full
 ProtectKernelModules=true
 ProtectControlGroups=true
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX AF_NETLINK
+{% include 'network-access.conf.j2' %}
 LockPersonality=true
 RestrictRealtime=true
 # RestrictNamespaces=true
