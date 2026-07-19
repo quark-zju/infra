@@ -27,18 +27,6 @@
     state: absent
   when: ansible_facts.distribution == "Debian"
 
-- name: Enable Fail2Ban protection for SSH on Debian
-  ansible.builtin.copy:
-    content: |
-      [sshd]
-      enabled = true
-    dest: /etc/fail2ban/jail.d/sshd.local
-    owner: root
-    group: root
-    mode: "0644"
-  notify: Restart Fail2Ban
-  when: ansible_facts.distribution == "Debian"
-
 - name: Enable and start Fail2Ban on Debian
   ansible.builtin.systemd_service:
     name: fail2ban
