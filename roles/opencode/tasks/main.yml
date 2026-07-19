@@ -361,6 +361,7 @@
     content: |
       OPENCODE_SERVER_PASSWORD={{ opencode_server_password | to_json }}
       OPENCODE_ENABLE_EXA=1
+      # Prefer the persistent server token at ~/.kimi-code/server.token; it does not expire server-side.
       KIMI_CODE_ALLOWED_HOSTS={{ kimi_code_allowed_hosts | to_json }}
       KIMI_DISABLE_TELEMETRY=1
   no_log: true
