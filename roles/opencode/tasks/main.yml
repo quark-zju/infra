@@ -374,6 +374,7 @@
   ansible.builtin.command:
     argv:
       - ip
+      - -j
       - -4
       - route
       - get
@@ -386,7 +387,10 @@
     opencode_primary_ipv4_addresses: >-
       {{
         opencode_primary_ipv4_route.stdout
-        | regex_findall('(?:^|\\s)src\\s+([0-9]+(?:\\.[0-9]+){3})(?:\\s|$)')
+        | from_json
+        | map(attribute='prefsrc', default='')
+        | select('match', '^[0-9]+(?:[.][0-9]+){3}$')
+        | list
       }}
 
 - name: Require one primary IPv4 address
@@ -395,7 +399,7 @@
       - opencode_primary_ipv4_addresses | length == 1
     fail_msg: >-
       Could not determine one primary IPv4 address from
-      "ip -4 route get 1.1.1.1": {{ opencode_primary_ipv4_route.stdout }}
+      "ip -j -4 route get 1.1.1.1": {{ opencode_primary_ipv4_route.stdout }}
 
 - name: Parse primary IPv4 octets
   ansible.builtin.set_fact:
