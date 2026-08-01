@@ -20,39 +20,8 @@
       - npm
       - prefix
       - -g
-  register: opencode_npm_prefix
+  register: npm_prefix
   changed_when: false
-
-- name: Check whether opencode is already installed globally
-  ansible.builtin.command:
-    argv:
-      - npm
-      - list
-      - -g
-      - opencode-ai
-      - --depth=0
-  register: opencode_npm_list
-  changed_when: false
-  failed_when: false
-
-- name: Parse installed opencode version from npm list output
-  ansible.builtin.set_fact:
-    opencode_installed_version: "{{ opencode_npm_list.stdout | regex_search('opencode-ai@[0-9]+\\.[0-9]+\\.[0-9]+') | default('', true) | regex_replace('^opencode-ai@', '') }}"
-  when: opencode_npm_list.rc == 0
-
-- name: Decide whether opencode upgrade is needed
-  ansible.builtin.set_fact:
-    opencode_upgrade_needed: "{{ (opencode_npm_list.rc != 0) or (opencode_installed_version is version(opencode_minimum_version, '<')) }}"
-
-- name: Install or upgrade opencode globally when below minimum version
-  ansible.builtin.command:
-    argv:
-      - npm
-      - install
-      - -g
-      - opencode-ai
-  when: opencode_upgrade_needed
-  notify: Restart opencode
 
 - name: Check whether kimi code is already installed globally
   ansible.builtin.command:
@@ -84,6 +53,18 @@
       - "@moonshot-ai/kimi-code"
   when: kimi_upgrade_needed
   notify: Restart kimi
+
+- name: Check whether the opencode binary exists
+  ansible.builtin.stat:
+    path: "{{ opencode_bin }}"
+  register: opencode_bin_stat
+
+- name: Show opencode deploy hint when binary is missing
+  ansible.builtin.debug:
+    msg: >-
+      {{ opencode_bin }} does not exist. Deploy it from {{ opencode_repo }}:
+      git clone {{ opencode_repo }} && cd opencode && make clean deploy
+  when: not opencode_bin_stat.stat.exists
 
 - name: Ensure opencode group exists
   ansible.builtin.group:
