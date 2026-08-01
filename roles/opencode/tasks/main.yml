@@ -327,12 +327,13 @@
     file: "{{ opencode_vault_file }}"
   when: opencode_vault_file | default('', true) | length > 0
 
-- name: Require opencode server password
-  ansible.builtin.assert:
-    that:
-      - opencode_server_password is defined
-      - opencode_server_password | length > 0
-    fail_msg: Define opencode_server_password, preferably in an ansible-vault file.
+- name: Warn when opencode server password is not set
+  ansible.builtin.debug:
+    msg: >-
+      opencode_server_password is not set; the opencode web server will run
+      without OPENCODE_SERVER_PASSWORD. Define it in an ansible-vault file
+      (inventory/group_vars/opi_nodes/vault.yml) and re-run the playbook.
+  when: opencode_server_password is not defined or opencode_server_password | length == 0
 
 - name: Write opencode environment file
   ansible.builtin.copy:
@@ -341,8 +342,8 @@
     group: root
     mode: "0600"
     content: |
-      OPENCODE_SERVER_PASSWORD={{ opencode_server_password | to_json }}
-      OPENCODE_ENABLE_EXA=1
+      {% if opencode_server_password is defined and opencode_server_password | length > 0 %}OPENCODE_SERVER_PASSWORD={{ opencode_server_password | to_json }}
+      {% endif %}OPENCODE_ENABLE_EXA=1
       # Prefer the persistent server token at ~/.kimi-code/server.token; it does not expire server-side.
       KIMI_CODE_ALLOWED_HOSTS={{ kimi_code_allowed_hosts | to_json }}
       KIMI_DISABLE_TELEMETRY=1

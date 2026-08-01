@@ -58,7 +58,7 @@ If the goal is to converge a machine to the configuration in this repository, us
 
 ## ansible-vault
 
-Keep secrets out of the repo in plaintext. The role expects `opencode_server_password`.
+Keep secrets out of the repo in plaintext. The role reads `opencode_server_password` when it is set; if it is missing, the playbook prints a warning and the opencode web server runs without `OPENCODE_SERVER_PASSWORD`.
 
 `ansible-vault` is recommended, not required. If `inventory/group_vars/opi_nodes/vault.yml` is kept out of Git, a plaintext file also works and Ansible will load it normally.
 
