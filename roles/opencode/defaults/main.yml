@@ -34,6 +34,7 @@ deepseek_harness_dir: /home/opencode/.deepseek-harness
 deepseek_harness_web_hostname: 0.0.0.0
 deepseek_harness_web_port: 3000
 deepseek_harness_package: "@deepseek-ai/dsh"
+opencode_pnpm_version: "9"
 opencode_enable_kimi: false
 opencode_private_lan_networks:
   - 10.0.0.0/8
