@@ -54,6 +54,42 @@
   when: kimi_upgrade_needed
   notify: Restart kimi
 
+- name: Install pnpm with npm
+  ansible.builtin.command:
+    argv:
+      - npm
+      - install
+      - -g
+      - pnpm
+  register: pnpm_install
+  changed_when: "'changed' in pnpm_install.stdout or pnpm_install.rc == 0"
+  when: deepseek_harness_enabled
+
+- name: Ensure DeepSeek harness directory exists
+  ansible.builtin.file:
+    path: "{{ deepseek_harness_dir }}"
+    state: directory
+    owner: "{{ opencode_user }}"
+    group: "{{ opencode_group }}"
+    mode: "0750"
+  when: deepseek_harness_enabled
+
+- name: Install DeepSeek harness with pnpm
+  ansible.builtin.command:
+    argv:
+      - pnpm
+      - add
+      - --dir
+      - "{{ deepseek_harness_dir }}"
+      - --save-exact
+      - "{{ deepseek_harness_package }}"
+  become: true
+  become_user: "{{ opencode_user }}"
+  environment:
+    HOME: "{{ opencode_home }}"
+  when: deepseek_harness_enabled
+  notify: Restart deepseek harness
+
 - name: Check whether the opencode binary exists
   ansible.builtin.stat:
     path: "{{ opencode_bin }}"
@@ -235,7 +271,6 @@
     owner: "{{ opencode_user }}"
     group: "{{ opencode_group }}"
     mode: "0700"
-
 - name: Install kimi code dotfiles links
   ansible.builtin.include_role:
     name: dotfiles
@@ -245,7 +280,6 @@
     dotfiles_kimi_code_config_dir: "{{ opencode_home }}/.kimi-code"
     dotfiles_kimi_code_link_owner: "{{ opencode_user }}"
     dotfiles_kimi_code_link_group: "{{ opencode_group }}"
-
 - name: Ensure opencode config directory exists
   ansible.builtin.file:
     path: "{{ opencode_home }}/.config/opencode"
@@ -435,10 +469,29 @@
   notify:
     - Reload systemd
     - Restart kimi
-
 - name: Ensure kimi service is enabled and started
   ansible.builtin.systemd:
     name: "{{ kimi_service_name }}"
     enabled: true
     state: started
     daemon_reload: true
+
+- name: Install DeepSeek harness systemd unit
+  ansible.builtin.template:
+    src: deepseek-harness.service.j2
+    dest: /etc/systemd/system/{{ deepseek_harness_service_name }}.service
+    owner: root
+    group: root
+    mode: "0644"
+  when: deepseek_harness_enabled
+  notify:
+    - Reload systemd
+    - Restart deepseek harness
+
+- name: Ensure DeepSeek harness service is enabled and started
+  ansible.builtin.systemd:
+    name: "{{ deepseek_harness_service_name }}"
+    enabled: true
+    state: started
+    daemon_reload: true
+  when: deepseek_harness_enabled

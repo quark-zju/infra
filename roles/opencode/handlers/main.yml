@@ -11,3 +11,8 @@
   ansible.builtin.systemd:
     name: "{{ kimi_service_name }}"
     state: restarted
+
+- name: Restart deepseek harness
+  ansible.builtin.systemd:
+    name: "{{ deepseek_harness_service_name }}"
+    state: restarted

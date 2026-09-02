@@ -1,0 +1,32 @@
+[Unit]
+Description=DeepSeek Harness Web
+After=network.target
+StartLimitIntervalSec={{ opencode_start_limit_interval_sec }}
+StartLimitBurst={{ opencode_start_limit_burst }}
+
+[Service]
+Type=simple
+User={{ opencode_user }}
+Group={{ opencode_group }}
+WorkingDirectory={{ deepseek_harness_dir }}
+Environment=HOME={{ opencode_home }}
+Environment=TMPDIR=/tmp
+Environment=PATH={{ opencode_home }}/.local/share/pnpm:/home/opencode/.cargo/bin:/usr/local/bin:/usr/bin:/bin
+EnvironmentFile={{ opencode_env_file }}
+ExecStart={{ opencode_leash_bin }} run /usr/bin/pnpm --dir {{ deepseek_harness_dir }} exec dsh web --host {{ deepseek_harness_web_hostname }} --port {{ deepseek_harness_web_port }}
+Restart=always
+RestartSec={{ opencode_restart_sec }}
+OOMPolicy=continue
+MemoryMax={{ opencode_memory_max }}
+MemoryHigh={{ opencode_memory_high }}
+ProtectSystem=full
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX AF_NETLINK
+{% include 'network-access.conf.j2' %}
+LockPersonality=true
+RestrictRealtime=true
+ReadWritePaths={{ opencode_home }}
+
+[Install]
+WantedBy=multi-user.target

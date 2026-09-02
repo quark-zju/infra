@@ -28,6 +28,12 @@ opencode_start_limit_interval_sec: 5min
 opencode_start_limit_burst: 5
 opencode_memory_high: 650M
 opencode_memory_max: 800M
+deepseek_harness_enabled: true
+deepseek_harness_service_name: deepseek-harness
+deepseek_harness_dir: /home/opencode/.deepseek-harness
+deepseek_harness_web_hostname: 0.0.0.0
+deepseek_harness_web_port: 3000
+deepseek_harness_package: "@deepseek-ai/dsh"
 opencode_private_lan_networks:
   - 10.0.0.0/8
   - 172.16.0.0/12
