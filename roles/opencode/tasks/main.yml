@@ -34,15 +34,20 @@
   register: kimi_npm_list
   changed_when: false
   failed_when: false
+  when: opencode_enable_kimi
+  tags: [kimi]
 
 - name: Parse installed kimi code version from npm list output
   ansible.builtin.set_fact:
     kimi_installed_version: "{{ kimi_npm_list.stdout | regex_search('@moonshot-ai/kimi-code@[0-9]+\\.[0-9]+\\.[0-9]+') | default('', true) | regex_replace('^@moonshot-ai/kimi-code@', '') }}"
-  when: kimi_npm_list.rc == 0
+  when: opencode_enable_kimi and kimi_npm_list.rc == 0
+  tags: [kimi]
 
 - name: Decide whether kimi code upgrade is needed
   ansible.builtin.set_fact:
     kimi_upgrade_needed: "{{ (kimi_npm_list.rc != 0) or (kimi_installed_version is version(kimi_minimum_version, '<')) }}"
+  when: opencode_enable_kimi
+  tags: [kimi]
 
 - name: Install or upgrade kimi code globally when below minimum version
   ansible.builtin.command:
@@ -51,8 +56,9 @@
       - install
       - -g
       - "@moonshot-ai/kimi-code"
-  when: kimi_upgrade_needed
+  when: opencode_enable_kimi and kimi_upgrade_needed
   notify: Restart kimi
+  tags: [kimi]
 
 - name: Install pnpm with npm
   ansible.builtin.command:
@@ -271,6 +277,8 @@
     owner: "{{ opencode_user }}"
     group: "{{ opencode_group }}"
     mode: "0700"
+  when: opencode_enable_kimi
+  tags: [kimi]
 - name: Install kimi code dotfiles links
   ansible.builtin.include_role:
     name: dotfiles
@@ -280,6 +288,8 @@
     dotfiles_kimi_code_config_dir: "{{ opencode_home }}/.kimi-code"
     dotfiles_kimi_code_link_owner: "{{ opencode_user }}"
     dotfiles_kimi_code_link_group: "{{ opencode_group }}"
+  when: opencode_enable_kimi
+  tags: [kimi]
 - name: Ensure opencode config directory exists
   ansible.builtin.file:
     path: "{{ opencode_home }}/.config/opencode"
@@ -469,12 +479,33 @@
   notify:
     - Reload systemd
     - Restart kimi
+  when: opencode_enable_kimi
+  tags: [kimi]
 - name: Ensure kimi service is enabled and started
   ansible.builtin.systemd:
     name: "{{ kimi_service_name }}"
     enabled: true
     state: started
     daemon_reload: true
+  when: opencode_enable_kimi
+  tags: [kimi]
+
+- name: Stop and disable Kimi service when disabled
+  ansible.builtin.systemd:
+    name: "{{ kimi_service_name }}"
+    enabled: false
+    state: stopped
+  when: not opencode_enable_kimi
+  failed_when: false
+  tags: [kimi]
+
+- name: Remove disabled Kimi systemd unit
+  ansible.builtin.file:
+    path: /etc/systemd/system/{{ kimi_service_name }}.service
+    state: absent
+  when: not opencode_enable_kimi
+  notify: Reload systemd
+  tags: [kimi]
 
 - name: Install DeepSeek harness systemd unit
   ansible.builtin.template:
