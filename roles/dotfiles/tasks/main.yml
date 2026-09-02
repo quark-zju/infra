@@ -146,7 +146,7 @@
   ansible.builtin.blockinfile:
     path: "{{ dotfiles_codex_config_path }}"
     create: true
-    mode: "0644"
+    mode: "0600"
     marker: "# {mark} ANSIBLE MANAGED CODEX ANALYTICS"
     block: |
       # https://www.reddit.com/r/codex/comments/1ucnd5y/codex_almost_made_me_worry_about_my_ssd_so_i/
