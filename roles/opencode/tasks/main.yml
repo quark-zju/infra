@@ -71,6 +71,12 @@
   changed_when: "'changed' in pnpm_install.stdout or pnpm_install.rc == 0"
   when: deepseek_harness_enabled
 
+- name: Determine installed pnpm path
+  ansible.builtin.shell: command -v pnpm
+  register: pnpm_path
+  changed_when: false
+  when: deepseek_harness_enabled
+
 - name: Ensure DeepSeek harness directory exists
   ansible.builtin.file:
     path: "{{ deepseek_harness_dir }}"
