@@ -31,18 +31,14 @@ dotfiles_links:
     src: ../src/dotfiles/.config/git-hooks
   - dest: "{{ ansible_facts.user_dir }}/bin/scripts"
     src: ../src/dotfiles/bin/scripts
-  - dest: "{{ ansible_facts.user_dir }}/bin/model-name"
-    src: ../src/dotfiles/bin/model-name
-  - dest: "{{ ansible_facts.user_dir }}/bin/forever"
-    src: ../src/dotfiles/bin/forever
-  - dest: "{{ ansible_facts.user_dir }}/bin/ett"
-    src: ../src/dotfiles/bin/ett
-  - dest: "{{ ansible_facts.user_dir }}/bin/lmv"
-    src: ../src/dotfiles/bin/lmv
-  - dest: "{{ ansible_facts.user_dir }}/bin/mvim"
-    src: ../src/dotfiles/bin/mvim
-  - dest: "{{ ansible_facts.user_dir }}/bin/trun"
-    src: ../src/dotfiles/bin/trun
+
+dotfiles_bin_link_names:
+  - model-name
+  - forever
+  - ett
+  - lmv
+  - mvim
+  - trun
 
 # Desktop/Wayland config directories only present on Linux.
 dotfiles_linux_config_link_names:
