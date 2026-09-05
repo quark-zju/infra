@@ -16,6 +16,7 @@ dotfiles_agents_source: "{{ dotfiles_repo_dest }}/.config/opencode/AGENTS.md"
 
 dotfiles_link_parent_dirs:
   - "{{ ansible_facts.user_dir }}/.config"
+  - "{{ ansible_facts.user_dir }}/bin"
 
 dotfiles_links:
   - dest: "{{ ansible_facts.user_dir }}/.zshrc"
@@ -28,6 +29,8 @@ dotfiles_links:
     src: src/dotfiles/.gitconfig
   - dest: "{{ ansible_facts.user_dir }}/.config/git-hooks"
     src: ../src/dotfiles/.config/git-hooks
+  - dest: "{{ ansible_facts.user_dir }}/bin/scripts"
+    src: ../src/dotfiles/bin/scripts
 
 dotfiles_opencode_config_dir: "{{ ansible_facts.user_dir }}/.config/opencode"
 dotfiles_kimi_code_config_dir: "{{ ansible_facts.user_dir }}/.kimi-code"
