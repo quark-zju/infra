@@ -153,6 +153,14 @@
       [analytics]
       enabled = {{ dotfiles_codex_config_analytics_enabled | bool | lower }}
 
+- name: Inject Codex config partial from dotfiles
+  ansible.builtin.blockinfile:
+    path: "{{ dotfiles_codex_config_path }}"
+    create: true
+    mode: "0600"
+    marker: "# {mark} ANSIBLE MANAGED CODEX CONFIG PARTIAL"
+    block: "{{ lookup('ansible.builtin.file', dotfiles_codex_config_partial_source_path) }}"
+
 - name: Link Codex AGENTS.md to dotfiles AGENTS.md
   ansible.builtin.file:
     src: "{{ dotfiles_codex_agents_link.src }}"
