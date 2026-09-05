@@ -32,6 +32,17 @@ dotfiles_links:
   - dest: "{{ ansible_facts.user_dir }}/bin/scripts"
     src: ../src/dotfiles/bin/scripts
 
+# Desktop/Wayland config directories only present on Linux.
+dotfiles_linux_config_link_names:
+  - fontconfig
+  - foot
+  - sway
+  - swaync
+  - waybar
+  - mako
+  - i3status
+  - kanshi
+
 dotfiles_opencode_config_dir: "{{ ansible_facts.user_dir }}/.config/opencode"
 dotfiles_kimi_code_config_dir: "{{ ansible_facts.user_dir }}/.kimi-code"
 dotfiles_zed_config_dir: "{{ ansible_facts.user_dir }}/.config/zed"

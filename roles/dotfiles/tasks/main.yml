@@ -118,6 +118,16 @@
     follow: false
   loop: "{{ dotfiles_links }}"
 
+- name: Install Linux desktop config symlinks
+  ansible.builtin.file:
+    src: "../src/dotfiles/.config/{{ item }}"
+    dest: "{{ ansible_facts.user_dir }}/.config/{{ item }}"
+    state: link
+    force: true
+    follow: false
+  loop: "{{ dotfiles_linux_config_link_names }}"
+  when: ansible_facts.system == "Linux"
+
 - name: Ensure opencode config directory exists
   ansible.builtin.file:
     path: "{{ dotfiles_opencode_config_dir }}"
