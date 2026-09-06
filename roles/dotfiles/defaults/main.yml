@@ -55,6 +55,7 @@ dotfiles_opencode_config_dir: "{{ ansible_facts.user_dir }}/.config/opencode"
 dotfiles_kimi_code_config_dir: "{{ ansible_facts.user_dir }}/.kimi-code"
 dotfiles_zed_config_dir: "{{ ansible_facts.user_dir }}/.config/zed"
 dotfiles_dsh_config_dir: "{{ ansible_facts.user_dir }}/.dsh"
+dotfiles_dsh_agents_source: "{{ dotfiles_repo_dest }}/.dsh/AGENTS.md"
 
 dotfiles_opencode_links:
   - dest: "{{ dotfiles_opencode_config_dir }}/AGENTS.md"
@@ -74,4 +75,4 @@ dotfiles_zed_agents_link:
 
 dotfiles_dsh_agents_link:
   dest: "{{ dotfiles_dsh_config_dir }}/AGENTS.md"
-  src: "{{ dotfiles_agents_source }}"
+  src: "{{ dotfiles_dsh_agents_source }}"
