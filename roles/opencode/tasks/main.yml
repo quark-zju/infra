@@ -222,7 +222,51 @@
   environment:
     HOME: "{{ opencode_home }}"
   when: deepseek_harness_enabled and not deepseek_harness_installed.stat.exists
+  register: deepseek_harness_install
   notify: Restart deepseek harness
+
+- name: Remove stale DeepSeek harness patch marker after pnpm installation
+  ansible.builtin.file:
+    path: "{{ deepseek_harness_patch_marker }}"
+    state: absent
+  when: deepseek_harness_enabled and (deepseek_harness_install.changed | default(false))
+
+- name: Check whether the DeepSeek harness source patch is already applied
+  ansible.builtin.stat:
+    path: "{{ deepseek_harness_patch_marker }}"
+  register: deepseek_harness_patch_marker_stat
+  when: deepseek_harness_enabled
+
+- name: Locate DeepSeek harness loopback hostname implementations
+  ansible.builtin.find:
+    paths: "{{ deepseek_harness_pnpm_store_dir }}"
+    patterns:
+      - index.js
+      - client.js
+    contains: 'function isLoopbackHostname\(hostname\) \{'
+    read_whole_file: true
+    recurse: true
+    file_type: file
+  register: deepseek_harness_patch_files
+  when: deepseek_harness_enabled and not deepseek_harness_patch_marker_stat.stat.exists
+
+- name: Force DeepSeek harness loopback hostname checks to succeed
+  ansible.builtin.replace:
+    path: "{{ item.path }}"
+    regexp: '(?ms)^([ \t]*)function isLoopbackHostname\(hostname\) \{\n.*?^\1\}'
+    replace: '\1function isLoopbackHostname(hostname) {\n\1\treturn true;\n\1}'
+    backup: false
+  loop: "{{ deepseek_harness_patch_files.files | default([]) }}"
+  when: deepseek_harness_enabled and not deepseek_harness_patch_marker_stat.stat.exists
+
+- name: Mark the DeepSeek harness source patch as applied
+  ansible.builtin.file:
+    path: "{{ deepseek_harness_patch_marker }}"
+    state: touch
+    owner: "{{ opencode_user }}"
+    group: "{{ opencode_group }}"
+    mode: "0644"
+  when: deepseek_harness_enabled and not deepseek_harness_patch_marker_stat.stat.exists
 
 - name: Check whether the opencode binary exists
   ansible.builtin.stat:

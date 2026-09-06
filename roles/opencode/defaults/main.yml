@@ -45,6 +45,8 @@ opencode_memory_max: 800M
 deepseek_harness_enabled: true
 deepseek_harness_service_name: deepseek-harness
 deepseek_harness_dir: /home/opencode/.deepseek-harness
+deepseek_harness_patch_marker: "{{ deepseek_harness_dir }}/.patched"
+deepseek_harness_pnpm_store_dir: "{{ deepseek_harness_dir }}/node_modules/.pnpm"
 deepseek_harness_web_hostname: 127.0.0.1
 deepseek_harness_web_port: 3080
 # dsh web can only bind loopback; a systemd-socket-proxyd pair publishes a wider
