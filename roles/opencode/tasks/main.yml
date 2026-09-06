@@ -631,7 +631,7 @@
   when: opencode_enable_kimi
   tags: [kimi]
 
-- name: Stop and disable Kimi service when disabled
+- name: Stop and disable Kimi service if disabled
   ansible.builtin.systemd:
     name: "{{ kimi_service_name }}"
     enabled: false
@@ -640,7 +640,7 @@
   failed_when: false
   tags: [kimi]
 
-- name: Remove disabled Kimi systemd unit
+- name: Remove Kimi systemd unit if disabled
   ansible.builtin.file:
     path: /etc/systemd/system/{{ kimi_service_name }}.service
     state: absent
