@@ -17,6 +17,24 @@
     state: present
     update_cache: true
 
+- name: Check which slow Armbian motd scripts exist
+  ansible.builtin.stat:
+    path: "/etc/update-motd.d/{{ item }}"
+  loop:
+    - 10-armbian-header
+    - 15-ap-info
+    - 20-ip-info
+    - 30-armbian-sysinfo
+    - 41-commands
+  register: opencode_motd_scripts_stat
+
+- name: Disable slow Armbian motd scripts to reduce SSH login overhead
+  ansible.builtin.file:
+    path: "{{ item.item }}"
+    mode: "a-x"
+  loop: "{{ opencode_motd_scripts_stat.results }}"
+  when: item.stat.exists
+
 - name: Ensure Node.js installation directory exists
   ansible.builtin.file:
     path: /opt
