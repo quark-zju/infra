@@ -25,6 +25,7 @@
     - 15-ap-info
     - 20-ip-info
     - 30-armbian-sysinfo
+    - 35-armbian-tips
     - 41-commands
   register: opencode_motd_scripts_stat
 
