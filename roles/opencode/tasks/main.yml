@@ -40,29 +40,17 @@
     remote_src: true
     creates: "{{ opencode_node_install_dir }}/bin/node"
 
-- name: Link the selected Node.js binary
+- name: Link selected Node.js executables
   ansible.builtin.file:
-    src: "{{ opencode_node_bin_dir }}/node"
-    dest: /usr/local/bin/node
+    src: "{{ opencode_node_bin_dir }}/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
     state: link
     owner: root
     group: root
-
-- name: Link the selected npm binary
-  ansible.builtin.file:
-    src: "{{ opencode_node_bin_dir }}/npm"
-    dest: /usr/local/bin/npm
-    state: link
-    owner: root
-    group: root
-
-- name: Link the selected npx binary
-  ansible.builtin.file:
-    src: "{{ opencode_node_bin_dir }}/npx"
-    dest: /usr/local/bin/npx
-    state: link
-    owner: root
-    group: root
+  loop:
+    - node
+    - npm
+    - npx
 
 - name: Determine global npm prefix
   ansible.builtin.command:
