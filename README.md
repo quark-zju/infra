@@ -119,5 +119,6 @@ ansible-playbook playbooks/opencode.yml --vault-password-file .vault_pass.txt
 - service home is `/home/opencode`
 - the root-only service environment lives at `/etc/opencode/opencode.env`; Kimi reuses the OpenCode server password and disables telemetry
 - OpenCode binds to `0.0.0.0:4096` and Kimi web binds to `0.0.0.0:58627` by default
+- DeepSeek Harness binds only to `127.0.0.1:3080` and is published on `0.0.0.0:3088` through a `dsh-proxy` systemd-socket-proxyd pair that forwards into the loopback listener
 - both web services run inside the leash sandbox
 - OpenCode is not npm-managed; the binary at `/usr/local/bin/opencode` is built from the `perf` branch of `https://github.com/quark-zju/opencode` via `make clean deploy`
