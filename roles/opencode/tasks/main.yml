@@ -401,21 +401,6 @@
     owner: "{{ opencode_user }}"
     group: "{{ opencode_group }}"
 
-- name: Check existing opencode git hooks path
-  ansible.builtin.stat:
-    path: "{{ opencode_home }}/.config/git-hooks"
-    follow: false
-  register: opencode_git_hooks_stat
-
-- name: Remove legacy copied opencode git hooks directory
-  ansible.builtin.file:
-    path: "{{ opencode_home }}/.config/git-hooks"
-    state: absent
-  when:
-    - opencode_git_hooks_stat.stat.exists
-    - opencode_git_hooks_stat.stat.isdir
-    - not opencode_git_hooks_stat.stat.islnk
-
 - name: Link opencode git hooks
   ansible.builtin.file:
     src: "{{ opencode_dotfiles_dir }}/.config/git-hooks"
