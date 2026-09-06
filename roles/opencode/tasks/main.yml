@@ -327,6 +327,17 @@
     group: "{{ opencode_group }}"
     mode: "0750"
 
+- name: Install DeepSeek harness wrapper
+  ansible.builtin.copy:
+    dest: "{{ deepseek_harness_wrapper }}"
+    content: |-
+      #!/bin/sh
+      exec /usr/local/bin/pnpm --dir /home/opencode/.deepseek-harness exec dsh "$@"
+    owner: "{{ opencode_user }}"
+    group: "{{ opencode_group }}"
+    mode: "0750"
+  when: deepseek_harness_enabled
+
 - name: Check whether Codex binary is already installed
   ansible.builtin.stat:
     path: "{{ opencode_codex_bin }}"
