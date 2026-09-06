@@ -42,7 +42,14 @@ deepseek_harness_enabled: true
 deepseek_harness_service_name: deepseek-harness
 deepseek_harness_dir: /home/opencode/.deepseek-harness
 deepseek_harness_web_hostname: 127.0.0.1
-deepseek_harness_web_port: 3000
+deepseek_harness_web_port: 3080
+# dsh web can only bind loopback; a systemd-socket-proxyd pair publishes a wider
+# listen address and forwards into the loopback listener.
+deepseek_harness_proxy_enabled: true
+deepseek_harness_proxy_service_name: dsh-proxy
+deepseek_harness_proxy_bin: /usr/lib/systemd/systemd-socket-proxyd
+deepseek_harness_proxy_bind_address: 0.0.0.0
+deepseek_harness_proxy_port: 3088
 deepseek_harness_package: "@deepseek-ai/dsh"
 opencode_pnpm_version: "9"
 opencode_enable_kimi: false
