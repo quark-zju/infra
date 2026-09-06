@@ -16,7 +16,7 @@ Environment=HOME={{ opencode_home }}
 Environment=XDG_RUNTIME_DIR=/run/user/{{ opencode_user_uid }}
 Environment=TMPDIR=/tmp
 Environment=AGENT_BROWSER_EXECUTABLE_PATH=/usr/bin/chromium
-Environment=PATH=/home/opencode/.cargo/bin:/home/opencode/.npm/global/bin:/home/opencode/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=PATH={{ opencode_node_bin_dir }}:/home/opencode/.cargo/bin:/home/opencode/.npm/global/bin:/home/opencode/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 EnvironmentFile={{ opencode_env_file }}
 # Leash reuses PID 2 in each PID namespace, so Kimi can mistake a stale PID-based lock for a running server.
 ExecStartPre=/usr/bin/rm -f {{ opencode_home }}/.kimi-code/server/lock

@@ -24,7 +24,7 @@ Environment=OPENCODE_EXPERIMENTAL_DISABLE_FILEWATCHER=1
 Environment=OPENCODE_DISABLE_CHANNEL_DB=1
 # Disable fff until https://github.com/anomalyco/opencode/issues/32511 is resolved.
 Environment=OPENCODE_DISABLE_FFF=1
-Environment=PATH=/home/opencode/.cargo/bin:/home/opencode/.npm/global/bin:/home/opencode/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=PATH={{ opencode_node_bin_dir }}:/home/opencode/.cargo/bin:/home/opencode/.npm/global/bin:/home/opencode/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 EnvironmentFile={{ opencode_env_file }}
 ExecStart={{ opencode_leash_bin }} run {{ opencode_bin }} serve --print-logs --log-level {{ opencode_log_level }} --hostname {{ opencode_web_hostname }} --port {{ opencode_web_port }}
 Restart=always

@@ -10,9 +10,49 @@
       - python-is-python3
       - ripgrep
       - rustup
+      - xz-utils
       - zsh
     state: present
     update_cache: true
+
+- name: Ensure Node.js installation directory exists
+  ansible.builtin.file:
+    path: /opt
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install Node.js {{ opencode_node_version }}
+  ansible.builtin.unarchive:
+    src: "{{ opencode_node_archive_url }}"
+    dest: /opt
+    remote_src: true
+    creates: "{{ opencode_node_install_dir }}/bin/node"
+
+- name: Link the selected Node.js binary
+  ansible.builtin.file:
+    src: "{{ opencode_node_bin_dir }}/node"
+    dest: /usr/local/bin/node
+    state: link
+    owner: root
+    group: root
+
+- name: Link the selected npm binary
+  ansible.builtin.file:
+    src: "{{ opencode_node_bin_dir }}/npm"
+    dest: /usr/local/bin/npm
+    state: link
+    owner: root
+    group: root
+
+- name: Link the selected npx binary
+  ansible.builtin.file:
+    src: "{{ opencode_node_bin_dir }}/npx"
+    dest: /usr/local/bin/npx
+    state: link
+    owner: root
+    group: root
 
 - name: Determine global npm prefix
   ansible.builtin.command:
@@ -20,6 +60,8 @@
       - npm
       - prefix
       - -g
+  environment:
+    PATH: "{{ opencode_node_bin_dir }}:{{ ansible_env.PATH }}"
   register: npm_prefix
   changed_when: false
 
@@ -31,6 +73,8 @@
       - -g
       - "@moonshot-ai/kimi-code"
       - --depth=0
+  environment:
+    PATH: "{{ opencode_node_bin_dir }}:{{ ansible_env.PATH }}"
   register: kimi_npm_list
   changed_when: false
   failed_when: false
@@ -56,6 +100,8 @@
       - install
       - -g
       - "@moonshot-ai/kimi-code"
+  environment:
+    PATH: "{{ opencode_node_bin_dir }}:{{ ansible_env.PATH }}"
   when: opencode_enable_kimi and kimi_upgrade_needed
   notify: Restart kimi
   tags: [kimi]
@@ -67,12 +113,16 @@
       - install
       - -g
       - "pnpm@{{ opencode_pnpm_version }}"
+  environment:
+    PATH: "{{ opencode_node_bin_dir }}:{{ ansible_env.PATH }}"
   register: pnpm_install
   changed_when: "'changed' in pnpm_install.stdout or pnpm_install.rc == 0"
   when: deepseek_harness_enabled
 
 - name: Determine installed pnpm path
   ansible.builtin.shell: command -v pnpm
+  environment:
+    PATH: "{{ opencode_node_bin_dir }}:{{ ansible_env.PATH }}"
   register: pnpm_path
   changed_when: false
   when: deepseek_harness_enabled
