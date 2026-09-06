@@ -13,7 +13,7 @@ Environment=HOME={{ opencode_home }}
 Environment=TMPDIR=/tmp
 Environment=PATH={{ opencode_node_bin_dir }}:{{ opencode_home }}/.local/share/pnpm:/home/opencode/.cargo/bin:/usr/local/bin:/usr/bin:/bin
 EnvironmentFile={{ opencode_env_file }}
-ExecStart={{ opencode_leash_bin }} run {{ pnpm_path.stdout }} --dir {{ deepseek_harness_dir }} exec dsh web --host {{ deepseek_harness_web_hostname }} --port {{ deepseek_harness_web_port }}
+ExecStart={{ opencode_leash_bin }} run {{ pnpm_path.stdout }} --dir {{ deepseek_harness_dir }} exec dsh web --no-open --host {{ deepseek_harness_web_hostname }} --port {{ deepseek_harness_web_port }}
 Restart=always
 RestartSec={{ opencode_restart_sec }}
 OOMPolicy=continue
