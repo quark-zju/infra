@@ -31,7 +31,7 @@ opencode_memory_max: 800M
 deepseek_harness_enabled: true
 deepseek_harness_service_name: deepseek-harness
 deepseek_harness_dir: /home/opencode/.deepseek-harness
-deepseek_harness_web_hostname: 0.0.0.0
+deepseek_harness_web_hostname: 127.0.0.1
 deepseek_harness_web_port: 3000
 deepseek_harness_package: "@deepseek-ai/dsh"
 opencode_pnpm_version: "9"
