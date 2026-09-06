@@ -48,6 +48,10 @@ deepseek_harness_dir: /home/opencode/.deepseek-harness
 deepseek_harness_patch_marker: "{{ deepseek_harness_dir }}/.patched"
 deepseek_harness_pnpm_store_dir: "{{ deepseek_harness_dir }}/node_modules/.pnpm"
 deepseek_harness_wrapper: "{{ opencode_home }}/.local/bin/dsh"
+deepseek_harness_profiles_dir: "{{ opencode_home }}/.dsh/profiles"
+deepseek_harness_plugins:
+  - profile: web
+    package: dsh-bill
 deepseek_harness_web_hostname: 127.0.0.1
 deepseek_harness_web_port: 3080
 # dsh web can only bind loopback; a systemd-socket-proxyd pair publishes a wider

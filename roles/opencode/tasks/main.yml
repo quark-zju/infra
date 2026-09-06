@@ -225,11 +225,65 @@
   register: deepseek_harness_install
   notify: Restart deepseek harness
 
+- name: Check whether configured DeepSeek harness plugins are present
+  ansible.builtin.command:
+    argv:
+      - /usr/local/bin/node
+      - -e
+      - >-
+        const fs = require('fs');
+        const packageJson = JSON.parse(fs.readFileSync(process.argv[1], 'utf8'));
+        const plugin = process.argv[2];
+        process.exit(
+          packageJson.dependencies?.[plugin]
+          || packageJson.devDependencies?.[plugin]
+          || packageJson.optionalDependencies?.[plugin]
+          ? 0 : 1
+        );
+      - "{{ deepseek_harness_profiles_dir }}/{{ item.profile }}/package.json"
+      - "{{ item.package }}"
+  become: true
+  become_user: "{{ opencode_user }}"
+  environment:
+    HOME: "{{ opencode_home }}"
+  loop: "{{ deepseek_harness_plugins }}"
+  register: deepseek_harness_plugin_checks
+  changed_when: false
+  failed_when: false
+  when: deepseek_harness_enabled and (deepseek_harness_plugins | length > 0)
+
+- name: Install missing DeepSeek harness plugins
+  ansible.builtin.command:
+    argv:
+      - /usr/local/bin/pnpm
+      - --dir
+      - "{{ deepseek_harness_dir }}"
+      - exec
+      - dsh
+      - plugin
+      - --profile
+      - "{{ item.item.profile }}"
+      - add
+      - -w
+      - "{{ item.item.package }}"
+  become: true
+  become_user: "{{ opencode_user }}"
+  environment:
+    HOME: "{{ opencode_home }}"
+  loop: "{{ deepseek_harness_plugin_checks.results | default([]) }}"
+  when: deepseek_harness_enabled and item.rc != 0
+  register: deepseek_harness_plugin_install
+  notify: Restart deepseek harness
+
 - name: Remove stale DeepSeek harness patch marker after pnpm installation
   ansible.builtin.file:
     path: "{{ deepseek_harness_patch_marker }}"
     state: absent
-  when: deepseek_harness_enabled and (deepseek_harness_install.changed | default(false))
+  when: >-
+    deepseek_harness_enabled and (
+      (deepseek_harness_install.changed | default(false))
+      or (deepseek_harness_plugin_install.changed | default(false))
+    )
 
 - name: Check whether the DeepSeek harness source patch is already applied
   ansible.builtin.stat:
