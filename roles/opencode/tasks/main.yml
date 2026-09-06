@@ -278,7 +278,6 @@
       - -o
       - "{{ opencode_codex_bin }}"
     creates: "{{ opencode_codex_bin }}"
-  changed_when: true
   become: true
   notify: Restart opencode
 
