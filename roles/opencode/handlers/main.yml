@@ -16,3 +16,11 @@
   ansible.builtin.systemd:
     name: "{{ deepseek_harness_service_name }}"
     state: restarted
+
+# Restarting the socket unit stops and re-arms socket activation, which also
+# restarts the socket-activated proxyd service (it is re-launched on the next
+# incoming connection).
+- name: Restart deepseek harness proxy
+  ansible.builtin.systemd:
+    name: "{{ deepseek_harness_proxy_service_name }}.socket"
+    state: restarted

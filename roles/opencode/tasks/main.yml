@@ -667,3 +667,53 @@
     state: started
     daemon_reload: true
   when: deepseek_harness_enabled
+
+- name: Install DeepSeek harness proxy socket
+  ansible.builtin.template:
+    src: dsh-proxy.socket.j2
+    dest: /etc/systemd/system/{{ deepseek_harness_proxy_service_name }}.socket
+    owner: root
+    group: root
+    mode: "0644"
+  when: deepseek_harness_proxy_enabled
+  notify:
+    - Reload systemd
+    - Restart deepseek harness proxy
+
+- name: Install DeepSeek harness proxy service
+  ansible.builtin.template:
+    src: dsh-proxy.service.j2
+    dest: /etc/systemd/system/{{ deepseek_harness_proxy_service_name }}.service
+    owner: root
+    group: root
+    mode: "0644"
+  when: deepseek_harness_proxy_enabled
+  notify:
+    - Reload systemd
+    - Restart deepseek harness proxy
+
+- name: Ensure DeepSeek harness proxy socket is enabled and started
+  ansible.builtin.systemd:
+    name: "{{ deepseek_harness_proxy_service_name }}.socket"
+    enabled: true
+    state: started
+    daemon_reload: true
+  when: deepseek_harness_proxy_enabled
+
+- name: Stop and disable DeepSeek harness proxy socket when disabled
+  ansible.builtin.systemd:
+    name: "{{ deepseek_harness_proxy_service_name }}.socket"
+    enabled: false
+    state: stopped
+  when: not deepseek_harness_proxy_enabled
+  failed_when: false
+
+- name: Remove disabled DeepSeek harness proxy units
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/systemd/system/{{ deepseek_harness_proxy_service_name }}.socket
+    - /etc/systemd/system/{{ deepseek_harness_proxy_service_name }}.service
+  when: not deepseek_harness_proxy_enabled
+  notify: Reload systemd
