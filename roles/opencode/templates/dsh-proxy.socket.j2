@@ -1,0 +1,9 @@
+[Unit]
+Description=DSH TCP proxy socket
+
+[Socket]
+ListenStream={{ deepseek_harness_proxy_bind_address }}:{{ deepseek_harness_proxy_port }}
+{% include 'network-access.conf.j2' %}
+
+[Install]
+WantedBy=sockets.target

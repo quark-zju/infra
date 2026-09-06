@@ -1,0 +1,9 @@
+[Unit]
+Description=DSH TCP proxy
+After=network.target
+
+[Service]
+Type=simple
+ExecStart={{ deepseek_harness_proxy_bin }} {{ deepseek_harness_web_hostname }}:{{ deepseek_harness_web_port }}
+Restart=on-failure
+RestartSec={{ opencode_restart_sec }}
