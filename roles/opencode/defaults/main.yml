@@ -27,6 +27,10 @@ opencode_node_install_dir: "/opt/node-v{{ opencode_node_version }}-{{ opencode_n
 opencode_node_archive_url: "https://nodejs.org/dist/v{{ opencode_node_version }}/node-v{{ opencode_node_version }}-{{ opencode_node_arch }}.tar.xz"
 opencode_node_archive: "/tmp/node-v{{ opencode_node_version }}-{{ opencode_node_arch }}.tar.xz"
 opencode_node_bin_dir: "{{ opencode_node_install_dir }}/bin"
+opencode_nvim_install_dir: /opt/nvim-linux-arm64
+opencode_nvim_archive_url: "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-arm64.tar.gz"
+opencode_nvim_archive: /tmp/nvim-linux-arm64.tar.gz
+opencode_nvim_bin: "{{ opencode_nvim_install_dir }}/bin/nvim"
 opencode_codex_version: rust-v0.153.4
 opencode_codex_download_url: "https://github.com/openai/codex/releases/download/{{ opencode_codex_version }}/codex-aarch64-unknown-linux-musl.zst"
 opencode_codex_archive: /tmp/codex-aarch64-unknown-linux-musl.zst

@@ -77,6 +77,35 @@
     - npm
     - npx
 
+- name: Check whether Neovim is already installed
+  ansible.builtin.stat:
+    path: "{{ opencode_nvim_bin }}"
+  register: opencode_nvim_installed
+
+- name: Download Neovim ARM64 archive
+  ansible.builtin.get_url:
+    url: "{{ opencode_nvim_archive_url }}"
+    dest: "{{ opencode_nvim_archive }}"
+    owner: root
+    group: root
+    mode: "0644"
+  when: not opencode_nvim_installed.stat.exists
+
+- name: Extract Neovim ARM64
+  ansible.builtin.unarchive:
+    src: "{{ opencode_nvim_archive }}"
+    dest: /opt
+    remote_src: true
+    creates: "{{ opencode_nvim_bin }}"
+
+- name: Link Neovim executable
+  ansible.builtin.file:
+    src: "{{ opencode_nvim_bin }}"
+    dest: /usr/local/bin/nvim
+    state: link
+    owner: root
+    group: root
+
 - name: Determine global npm prefix
   ansible.builtin.command:
     argv:
