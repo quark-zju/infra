@@ -280,10 +280,7 @@
     path: "{{ deepseek_harness_patch_marker }}"
     state: absent
   when: >-
-    deepseek_harness_enabled and (
-      (deepseek_harness_install.changed | default(false))
-      or (deepseek_harness_plugin_install.changed | default(false))
-    )
+    deepseek_harness_enabled and (deepseek_harness_install.changed | default(false))
 
 - name: Check whether the DeepSeek harness source patch is already applied
   ansible.builtin.stat:
