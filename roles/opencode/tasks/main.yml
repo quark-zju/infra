@@ -700,7 +700,7 @@
     daemon_reload: true
   when: deepseek_harness_proxy_enabled
 
-- name: Stop and disable DeepSeek harness proxy socket when disabled
+- name: Stop and disable DeepSeek harness proxy socket if disabled
   ansible.builtin.systemd:
     name: "{{ deepseek_harness_proxy_service_name }}.socket"
     enabled: false
@@ -708,7 +708,7 @@
   when: not deepseek_harness_proxy_enabled
   failed_when: false
 
-- name: Remove disabled DeepSeek harness proxy units
+- name: Remove DeepSeek harness proxy units if disabled
   ansible.builtin.file:
     path: "{{ item }}"
     state: absent
