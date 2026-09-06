@@ -30,7 +30,7 @@
 
 - name: Disable slow Armbian motd scripts to reduce SSH login overhead
   ansible.builtin.file:
-    path: "{{ item.item }}"
+    path: "/etc/update-motd.d/{{ item.item }}"
     mode: "a-x"
   loop: "{{ opencode_motd_scripts_stat.results }}"
   when: item.stat.exists
