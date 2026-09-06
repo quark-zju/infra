@@ -279,7 +279,6 @@
       - "{{ opencode_codex_bin }}"
     creates: "{{ opencode_codex_bin }}"
   become: true
-  notify: Restart opencode
 
 - name: Set Codex binary ownership and permissions
   ansible.builtin.file:
