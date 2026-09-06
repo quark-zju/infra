@@ -44,6 +44,11 @@
     group: root
     mode: "0755"
 
+- name: Check whether Node.js {{ opencode_node_version }} is already installed
+  ansible.builtin.stat:
+    path: "{{ opencode_node_install_dir }}/bin/node"
+  register: opencode_node_installed
+
 - name: Download Node.js {{ opencode_node_version }} archive
   ansible.builtin.get_url:
     url: "{{ opencode_node_archive_url }}"
@@ -51,6 +56,7 @@
     owner: root
     group: root
     mode: "0644"
+  when: not opencode_node_installed.stat.exists
 
 - name: Extract Node.js {{ opencode_node_version }}
   ansible.builtin.unarchive:
@@ -123,7 +129,19 @@
   notify: Restart kimi
   tags: [kimi]
 
-- name: Install pnpm with npm
+- name: Check whether pnpm {{ opencode_pnpm_version }} is already installed
+  ansible.builtin.command:
+    argv:
+      - pnpm
+      - --version
+  environment:
+    PATH: "{{ opencode_node_bin_dir }}:{{ ansible_env.PATH }}"
+  register: pnpm_version_check
+  changed_when: false
+  failed_when: false
+  when: deepseek_harness_enabled
+
+- name: Install pnpm {{ opencode_pnpm_version }} when missing or wrong major
   ansible.builtin.command:
     argv:
       - npm
@@ -132,9 +150,11 @@
       - "pnpm@{{ opencode_pnpm_version }}"
   environment:
     PATH: "{{ opencode_node_bin_dir }}:{{ ansible_env.PATH }}"
-  register: pnpm_install
-  changed_when: "'changed' in pnpm_install.stdout or pnpm_install.rc == 0"
-  when: deepseek_harness_enabled
+  when: >
+    deepseek_harness_enabled and (
+      pnpm_version_check.rc != 0
+      or (pnpm_version_check.stdout | trim | split('.') | first) != (opencode_pnpm_version | split('.') | first)
+    )
 
 - name: Determine installed pnpm path
   ansible.builtin.shell: command -v pnpm
@@ -153,6 +173,12 @@
     mode: "0750"
   when: deepseek_harness_enabled
 
+- name: Check whether DeepSeek harness package is already installed
+  ansible.builtin.stat:
+    path: "{{ deepseek_harness_dir }}/node_modules/{{ deepseek_harness_package }}"
+  register: deepseek_harness_installed
+  when: deepseek_harness_enabled
+
 - name: Install DeepSeek harness with pnpm
   ansible.builtin.command:
     argv:
@@ -166,7 +192,7 @@
   become_user: "{{ opencode_user }}"
   environment:
     HOME: "{{ opencode_home }}"
-  when: deepseek_harness_enabled
+  when: deepseek_harness_enabled and not deepseek_harness_installed.stat.exists
   notify: Restart deepseek harness
 
 - name: Check whether the opencode binary exists
@@ -228,6 +254,11 @@
     group: "{{ opencode_group }}"
     mode: "0750"
 
+- name: Check whether Codex binary is already installed
+  ansible.builtin.stat:
+    path: "{{ opencode_codex_bin }}"
+  register: opencode_codex_bin_stat
+
 - name: Download Codex release
   ansible.builtin.get_url:
     url: "{{ opencode_codex_download_url }}"
@@ -235,6 +266,7 @@
     owner: root
     group: root
     mode: "0644"
+  when: not opencode_codex_bin_stat.stat.exists
 
 - name: Extract Codex into opencode local bin
   ansible.builtin.command:
