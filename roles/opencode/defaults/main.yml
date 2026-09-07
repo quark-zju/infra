@@ -54,7 +54,7 @@ deepseek_harness_plugins:
     package: dsh-bill
   - profile: web
     package: dsh-web-notification
-    source: https://github.com/pd90506/dsh-web-notification/archive/refs/tags/v0.1.0.tar.gz
+    source: https://github.com/2h0n/dsh-web-notification/archive/refs/tags/v0.1.0.tar.gz
 deepseek_harness_web_hostname: 127.0.0.1
 deepseek_harness_web_port: 3080
 # dsh web can only bind loopback; a systemd-socket-proxyd pair publishes a wider
