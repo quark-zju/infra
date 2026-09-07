@@ -225,6 +225,55 @@
   register: deepseek_harness_install
   notify: Restart deepseek harness
 
+- name: Ensure DeepSeek plugins source parent directory exists
+  ansible.builtin.file:
+    path: "{{ deepseek_harness_plugins_repo_dir | dirname }}"
+    state: directory
+    owner: "{{ opencode_user }}"
+    group: "{{ opencode_group }}"
+    mode: "0750"
+  when: deepseek_harness_enabled
+
+- name: Check whether DeepSeek plugins repository exists
+  ansible.builtin.stat:
+    path: "{{ deepseek_harness_plugins_repo_dir }}/.git"
+  register: deepseek_harness_plugins_repo_git_dir
+  when: deepseek_harness_enabled
+
+- name: Read existing DeepSeek plugins repository origin URL
+  ansible.builtin.command:
+    argv:
+      - git
+      - -C
+      - "{{ deepseek_harness_plugins_repo_dir }}"
+      - config
+      - --get
+      - remote.origin.url
+  register: deepseek_harness_plugins_repo_origin_url
+  changed_when: false
+  failed_when: false
+  when: deepseek_harness_enabled and deepseek_harness_plugins_repo_git_dir.stat.exists
+
+- name: Clone or update DeepSeek plugins repository
+  ansible.builtin.git:
+    repo: >-
+      {{ deepseek_harness_plugins_repo_origin_url.stdout
+         if (
+           deepseek_harness_plugins_repo_git_dir.stat.exists
+           and deepseek_harness_plugins_repo_origin_url.stdout is defined
+           and (
+             deepseek_harness_plugins_repo_origin_url.stdout.startswith('git@')
+             or deepseek_harness_plugins_repo_origin_url.stdout.startswith('ssh://')
+           )
+         )
+         else deepseek_harness_plugins_repo }}
+    dest: "{{ deepseek_harness_plugins_repo_dir }}"
+    version: HEAD
+    update: true
+  become: true
+  become_user: "{{ opencode_user }}"
+  when: deepseek_harness_enabled
+
 - name: Check whether configured DeepSeek harness plugins are present
   ansible.builtin.command:
     argv:
