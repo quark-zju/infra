@@ -265,7 +265,7 @@
       - "{{ item.item.profile }}"
       - add
       - -w
-      - "{{ item.item.package }}"
+      - "{{ item.item.source | default(item.item.package) }}"
   become: true
   become_user: "{{ opencode_user }}"
   environment:
