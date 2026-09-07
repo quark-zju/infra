@@ -21,6 +21,7 @@ opencode_leash_bin: /home/opencode/.cargo/bin/leash
 opencode_web_hostname: 0.0.0.0
 opencode_web_port: 4096
 opencode_bin: /usr/local/bin/opencode
+opencode_enabled: true
 opencode_node_version: 24.20.0
 opencode_node_arch: linux-arm64
 opencode_node_install_dir: "/opt/node-v{{ opencode_node_version }}-{{ opencode_node_arch }}"

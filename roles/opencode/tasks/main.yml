@@ -786,6 +786,7 @@
   notify:
     - Reload systemd
     - Restart opencode
+  when: opencode_enabled
 
 - name: Ensure opencode service is enabled and started
   ansible.builtin.systemd:
@@ -793,6 +794,22 @@
     enabled: true
     state: started
     daemon_reload: true
+  when: opencode_enabled
+
+- name: Stop and disable opencode service if disabled
+  ansible.builtin.systemd:
+    name: "{{ opencode_service_name }}"
+    enabled: false
+    state: stopped
+  when: not opencode_enabled
+  failed_when: false
+
+- name: Remove opencode systemd unit if disabled
+  ansible.builtin.file:
+    path: /etc/systemd/system/{{ opencode_service_name }}.service
+    state: absent
+  when: not opencode_enabled
+  notify: Reload systemd
 
 - name: Install kimi systemd unit
   ansible.builtin.template:
