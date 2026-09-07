@@ -22,3 +22,9 @@ RUNS=3 experiments/pyinfra-opencode/benchmark.sh
 
 Raw logs and `times.csv` are written under `results/`, which is ignored. See
 `RESULTS.md` for the environment, measurements, limitations, and conclusion.
+
+See `ANALYSIS.zh.md` for a Chinese-language analysis of pyinfra's two-phase
+semantics, the OpenCode role's runtime dependencies, and the feasibility and
+estimated benefit of single-host DAG parallelism. `profile_stages.py` can be
+used to measure the wall time of pyinfra's Setup, Connect, Prepare, and Execute
+stages without changing the deployment.
