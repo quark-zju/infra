@@ -113,6 +113,7 @@ ansible-playbook playbooks/opencode.yml --vault-password-file .vault_pass.txt
 
 ## Notes
 
+- The macOS role installs `blueutil` for Hammerspoon. On configuration load it logs paired Sony headphones; before system sleep it refreshes the paired list and disconnects connected WH-, WF-, WI-, MDR-, and LinkBuds devices. Custom device names can be covered by adding Bluetooth addresses to `sonyHeadphoneAddresses` in `roles/macos/files/hammerspoon/init.lua`. After deploying, reload Hammerspoon and allow Bluetooth access if macOS prompts. Screen lock or display sleep alone does not trigger disconnection.
 - `ansible.cfg` keeps controller temporary files under `/tmp` so local macOS runs do not depend on `~/.ansible/tmp` being writable
 - `opencode` and `kimi` run as the dedicated `opencode` system user and group
 - linger is enabled for the `opencode` user so `/run/user/<uid>` remains available without an interactive login

@@ -8,6 +8,7 @@
 - name: Check Homebrew formulae
   ansible.builtin.command: "{{ macos_brew_path.stdout }} list --formula {{ item }}"
   loop:
+    - blueutil
     - neovim
     - pyenv
     - ripgrep
