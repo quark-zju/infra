@@ -4,7 +4,15 @@ local lastDeviceName = ""
 
 function audioDeviceChanged()
     local current = hs.audiodevice.defaultOutputDevice()
+    if not current then
+        lastDeviceName = ""
+        return
+    end
     local name = current:name()
+    if not name then
+        lastDeviceName = ""
+        return
+    end
 
     if name ~= lastDeviceName then
         lastDeviceName = name
@@ -32,6 +40,19 @@ end
 -- Use lowercase, hyphen-separated addresses, e.g. ["aa-bb-cc-dd-ee-ff"] = true.
 local sonyHeadphoneAddresses = {}
 
+local function runBlueutil(arguments)
+    -- hs.execute otherwise omits stderr, hiding Bluetooth permission failures.
+    local output, success, termination, code = hs.execute(blueutilPath .. " " .. arguments .. " 2>&1")
+    if not success then
+        bluetoothLog.e(string.format("blueutil %s failed (%s %s): %s",
+            arguments, tostring(termination), tostring(code), output))
+        if code == 69 or code == 134 or (termination == "signal" and code == 6) then
+            bluetoothLog.e("Check System Settings > Privacy & Security > Bluetooth: allow Hammerspoon/blueutil, then reload Hammerspoon. Also check that Bluetooth is on.")
+        end
+    end
+    return output, success
+end
+
 local function isSonyHeadphone(device)
     local name = (device.name or ""):upper()
     name = name:gsub("^LE[_ %-]*", ""):gsub("^SONY[_ %-]*", "")
@@ -44,9 +65,8 @@ local function isSonyHeadphone(device)
 end
 
 local function pairedSonyHeadphones()
-    local output, success = hs.execute(blueutilPath .. " --paired --format json")
+    local output, success = runBlueutil("--format json --paired")
     if not success then
-        bluetoothLog.e("Cannot list paired Bluetooth devices: " .. output)
         return {}
     end
     local decoded, devices = pcall(hs.json.decode, output)
@@ -78,11 +98,9 @@ if blueutilPath then
         for _, device in ipairs(pairedSonyHeadphones()) do
             local address = device.address or ""
             if device.connected == true and address:match("^%x%x%-%x%x%-%x%x%-%x%x%-%x%x%-%x%x$") then
-                local output, success = hs.execute(blueutilPath .. " --disconnect " .. address)
+                local _, success = runBlueutil("--disconnect " .. address)
                 if success then
                     bluetoothLog.i("Disconnected: " .. (device.name or address))
-                else
-                    bluetoothLog.e("Cannot disconnect " .. address .. ": " .. output)
                 end
             end
         end
