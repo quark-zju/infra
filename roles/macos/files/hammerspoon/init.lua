@@ -11,7 +11,7 @@ if hs.fs.attributes(localConfig, "mode") == "file" then
     dofile(localConfig)
 end
 
-local function maxVolumeFor(device)
+local function volumeLimit(device)
     local limit = 20
     if type(getMaxVolumn) == "function" then
         local ok, value = pcall(getMaxVolumn, device)
@@ -27,7 +27,7 @@ local watchedOutput
 
 local function clampVolume(device)
     if not device then return end
-    local maxVolume = maxVolumeFor(device)
+    local maxVolume = volumeLimit(device)
     local volume = device:outputVolume()
     if volume and volume > maxVolume and not device:setOutputVolume(maxVolume) then
         print("Unable to limit output volume: " .. (device:name() or "unknown device"))
