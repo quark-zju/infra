@@ -12,7 +12,7 @@ if hs.fs.attributes(localConfig, "mode") == "file" then
 end
 
 local function effectiveVolumeLimit(device)
-    local limit = 20
+    local limit = 10
     if type(volumeLimit) == "function" then
         local ok, value = pcall(volumeLimit, device)
         if ok and type(value) == "number" and value >= 1 and value <= 100 then
