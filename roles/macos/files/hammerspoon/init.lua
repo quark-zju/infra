@@ -1,6 +1,32 @@
 local targetDeviceName = "AirPods Pro"  -- your device name
 local targetVolume = 10
 local lastDeviceName = ""
+local maxVolume = 20
+local watchedOutput
+
+local function clampVolume(device)
+    if not device then return end
+    local volume = device:outputVolume()
+    if volume and volume > maxVolume and not device:setOutputVolume(maxVolume) then
+        print("Unable to limit output volume: " .. (device:name() or "unknown device"))
+    end
+end
+
+local function watchDefaultOutput()
+    if watchedOutput then watchedOutput:watcherStop() end
+    watchedOutput = hs.audiodevice.defaultOutputDevice()
+    if not watchedOutput then return end
+
+    watchedOutput:watcherCallback(function(uid, event, scope)
+        if (event == "vmvc" or event == "volm") and (scope == "outp" or scope == "glob") then
+            clampVolume(hs.audiodevice.findDeviceByUID(uid))
+        end
+    end)
+    if not watchedOutput:watcherStart() then
+        print("Unable to watch output device: " .. (watchedOutput:name() or "unknown device"))
+    end
+    clampVolume(watchedOutput)
+end
 
 function audioDeviceChanged()
     local current = hs.audiodevice.defaultOutputDevice()
@@ -23,8 +49,12 @@ function audioDeviceChanged()
     end
 end
 
-hs.audiodevice.watcher.setCallback(audioDeviceChanged)
+hs.audiodevice.watcher.setCallback(function(event)
+    audioDeviceChanged()
+    if event == "dOut" then watchDefaultOutput() end
+end)
 hs.audiodevice.watcher:start()
+watchDefaultOutput()
 
 -- blueutil is installed by the macOS Ansible role. GUI apps may have a minimal PATH.
 local bluetoothLog = hs.logger.new("sonySleep", "info")
