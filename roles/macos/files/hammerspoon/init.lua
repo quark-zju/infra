@@ -15,7 +15,7 @@ local function effectiveVolumeLimit(device)
     local limit = 20
     if type(volumeLimit) == "function" then
         local ok, value = pcall(volumeLimit, device)
-        if ok and type(value) == "number" and value >= 10 and value <= 100 then
+        if ok and type(value) == "number" and value >= 1 and value <= 100 then
             limit = value
         elseif not ok then
             print("volumeLimit failed: " .. tostring(value))
