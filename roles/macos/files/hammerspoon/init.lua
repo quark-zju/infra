@@ -2,7 +2,7 @@ local targetDeviceName = "AirPods Pro"  -- your device name
 local targetVolume = 10
 local lastDeviceName = ""
 -- Optional ~/.hammerspoon/local.lua example:
--- function getMaxVolumn(device)
+-- function volumeLimit(device)
 --     if (device:name() or ""):find("AirPods", 1, true) then return 15 end
 --     return 30
 -- end
@@ -11,14 +11,14 @@ if hs.fs.attributes(localConfig, "mode") == "file" then
     dofile(localConfig)
 end
 
-local function volumeLimit(device)
+local function effectiveVolumeLimit(device)
     local limit = 20
-    if type(getMaxVolumn) == "function" then
-        local ok, value = pcall(getMaxVolumn, device)
+    if type(volumeLimit) == "function" then
+        local ok, value = pcall(volumeLimit, device)
         if ok and type(value) == "number" and value >= 10 and value <= 100 then
             limit = value
         elseif not ok then
-            print("getMaxVolumn failed: " .. tostring(value))
+            print("volumeLimit failed: " .. tostring(value))
         end
     end
     return math.min(limit, 50)
@@ -27,7 +27,7 @@ local watchedOutput
 
 local function clampVolume(device)
     if not device then return end
-    local maxVolume = volumeLimit(device)
+    local maxVolume = effectiveVolumeLimit(device)
     local volume = device:outputVolume()
     if volume and volume > maxVolume and not device:setOutputVolume(maxVolume) then
         print("Unable to limit output volume: " .. (device:name() or "unknown device"))
